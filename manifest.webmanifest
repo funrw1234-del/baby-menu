@@ -1,0 +1,17 @@
+{
+  "name": "Меню малыша",
+  "short_name": "Меню",
+  "description": "Меню на неделю для малыша 8 месяцев, дневник стула и план введения продуктов",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "ru",
+  "background_color": "#F3F6F1",
+  "theme_color": "#2C6B51",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

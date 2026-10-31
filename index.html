@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Меню малыша</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&display=swap">
+<meta name="description" content="Меню на неделю для малыша 8 месяцев с рецептами, дневником стула и планом введения продуктов">
+<meta name="theme-color" content="#F3F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111613" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Меню">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* Layout: one column of "day" panels; tabs sit in the header on desktop and become a bottom bar on phones. */
+:root{
+  --bg:#F3F6F1; --surface:#FFFFFF; --surface-2:#EAF0E7; --ink:#1B2620; --muted:#5B6A61; --line:#D9E2D6;
+  --accent:#2C6B51; --accent-ink:#FFFFFF; --accent-soft:#DAEBE1;
+  --plum:#7B3D64; --plum-soft:#F2E3EC; --apricot:#C9741F; --apricot-soft:#FBEAD7;
+  --ok:#2E8B57; --warn:#B9740B; --bad:#C0403A; --info:#356BA3;
+  --ok-soft:#DFF1E6; --warn-soft:#FBEFD6; --bad-soft:#F9E1DF; --info-soft:#E1ECF8;
+  --glass:rgba(243,246,241,.88);
+  --shadow:0 1px 2px rgba(27,38,32,.06),0 8px 24px -12px rgba(27,38,32,.18);
+  --f-display:"Unbounded","Manrope",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r-lg:20px; --r-md:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111613; --surface:#18201B; --surface-2:#202A24; --ink:#E6EEE8; --muted:#97A69D; --line:#2B3730;
+  --accent:#6CC6A0; --accent-ink:#0D1A13; --accent-soft:#1D3A2D;
+  --plum:#D995BE; --plum-soft:#3A2333; --apricot:#F0A65A; --apricot-soft:#3A2A18;
+  --ok:#5CC88C; --warn:#E6AE45; --bad:#EF7C74; --info:#82B2E4;
+  --ok-soft:#1C3527; --warn-soft:#3A2F17; --bad-soft:#3D2120; --info-soft:#1C2D40;
+  --glass:rgba(17,22,19,.88);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111613; --surface:#18201B; --surface-2:#202A24; --ink:#E6EEE8; --muted:#97A69D; --line:#2B3730;
+  --accent:#6CC6A0; --accent-ink:#0D1A13; --accent-soft:#1D3A2D;
+  --plum:#D995BE; --plum-soft:#3A2333; --apricot:#F0A65A; --apricot-soft:#3A2A18;
+  --ok:#5CC88C; --warn:#E6AE45; --bad:#EF7C74; --info:#82B2E4;
+  --ok-soft:#1C3527; --warn-soft:#3A2F17; --bad-soft:#3D2120; --info-soft:#1C2D40;
+  --glass:rgba(17,22,19,.88);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font:inherit;color:inherit;margin:0;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:-.01em;text-wrap:balance;margin:0}
+p{margin:0}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+.app{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;gap:16px;padding-block:14px;margin-inline:-4px;padding-inline:4px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.logo{width:42px;height:42px;border-radius:13px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:15px;flex:none}
+.brand h1{font-size:19px}
+.sub{font-size:12.5px;color:var(--muted)}
+.sync{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sync.on::before{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}
+
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+.tab{border:0;background:transparent;border-radius:999px;padding:8px 14px;display:flex;align-items:center;gap:7px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.tab svg{width:18px;height:18px;flex:none}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:719px){
+  /* no backdrop-filter here: it would turn the header into the containing block of the fixed tab bar */
+  .top{flex-wrap:nowrap;gap:10px;backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
+  .brand h1{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sync{font-size:0;gap:0}
+  .sync::before{width:10px;height:10px}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;border-radius:22px 22px 0 0;border-width:1px 0 0;justify-content:space-around;padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  .tab{flex-direction:column;gap:2px;font-size:10.5px;padding:7px 4px;flex:1;border-radius:14px}
+  .tab svg{width:21px;height:21px}
+  .tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+}
+
+.view{display:flex;flex-direction:column;gap:16px;padding-top:6px}
+.view[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.view:not([hidden]){animation:rise .35s ease both}}
+@keyframes rise{from{transform:translateY(6px);opacity:.6}to{transform:none;opacity:1}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow);min-width:0}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sec-title{font-size:16px;margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+
+/* hero */
+.hero{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(135deg,var(--accent-soft),var(--surface) 70%)}
+.hero>div:first-child{min-width:0;flex:1}
+.hero h2{font-size:clamp(22px,4.6vw,30px);margin-top:4px}
+.hero .muted{margin-top:6px}
+.ring{width:96px;height:96px;flex:none;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .trk{stroke:var(--surface-2)}
+.ring .val{stroke:var(--accent);transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
+.ring b{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;place-items:center;font-family:var(--f-display);font-size:20px}
+.ring b small{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted);font-weight:600;margin-top:-6px}
+
+/* alert */
+.alert{display:flex;gap:12px;align-items:flex-start;border-radius:var(--r-md);padding:14px 16px;border:1px solid transparent}
+.alert .dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}
+.alert h4{margin:0;font-size:14.5px}
+.alert p{font-size:13.5px;margin-top:2px}
+.alert.ok{background:var(--ok-soft)} .alert.ok .dot{background:var(--ok)}
+.alert.warn{background:var(--warn-soft)} .alert.warn .dot{background:var(--warn)}
+.alert.bad{background:var(--bad-soft)} .alert.bad .dot{background:var(--bad)}
+.alert.info{background:var(--info-soft)} .alert.info .dot{background:var(--info)}
+
+/* water */
+.water-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.water-val{font-family:var(--f-display);font-size:26px}
+.water-val span{font-family:var(--f-body);font-size:13px;color:var(--muted);font-weight:600}
+.drops{display:flex;gap:6px;margin-top:12px}
+.drop{flex:1;height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.drop i{display:block;height:100%;width:0;background:var(--info);transition:width .3s}
+.stepper{display:flex;gap:8px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;transition:transform .1s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent}
+.btn.round{width:42px;padding:0;border-radius:50%;font-size:20px}
+.btn.danger{color:var(--bad)}
+.btn.block{width:100%}
+
+/* timeline */
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.slot{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;transition:border-color .2s,background .2s}
+.slot.done{background:var(--accent-soft);border-color:transparent}
+.slot .t{font-weight:800;font-size:14px;padding-top:3px}
+.slot .t small{display:block;font-weight:600;font-size:11px;color:var(--muted)}
+.slot h4{margin:0;font-size:15px}
+.slot .what{font-size:13.5px;color:var(--muted)}
+.slot details{margin-top:6px}
+.slot summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent);list-style:none}
+.slot summary::-webkit-details-marker{display:none}
+.slot summary::after{content:" ▾"}
+.slot details[open] summary::after{content:" ▴"}
+.items{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.items li{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;border-bottom:1px dashed var(--line);padding-bottom:4px}
+.items li span:last-child{font-weight:700;white-space:nowrap}
+
+.chk{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center;flex:none;transition:background .2s,border-color .2s,transform .15s}
+.chk svg{width:20px;height:20px;stroke:var(--accent-ink);stroke-width:3;fill:none;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .25s ease .05s}
+.chk[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+.chk[aria-pressed="true"] svg{stroke-dashoffset:0}
+@media (prefers-reduced-motion:no-preference){.chk[aria-pressed="true"]{animation:pop .3s}}
+@keyframes pop{50%{transform:scale(1.12)}}
+
+/* menu */
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.day{flex:1 0 64px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:700}
+.day small{font-size:11px;color:var(--muted);font-weight:600}
+.day .pips{display:flex;gap:3px}
+.day .pips i{width:6px;height:6px;border-radius:50%;background:var(--surface-2)}
+.day .pips i.on{background:var(--accent)}
+.day[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.day[aria-pressed="true"] small{color:inherit;opacity:.7}
+.day.today{box-shadow:inset 0 0 0 2px var(--apricot)}
+.day[aria-pressed="true"] .pips i:not(.on){background:currentColor;opacity:.3}
+
+.meal{display:flex;flex-direction:column;gap:10px}
+.meal-head{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
+.meal-head .tag{display:inline-block;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:99px;margin-bottom:6px}
+.tag.b{background:var(--apricot-soft);color:var(--apricot)}
+.tag.l{background:var(--accent-soft);color:var(--accent)}
+.tag.d{background:var(--plum-soft);color:var(--plum)}
+.meal h3{font-size:17px}
+.recipes{border-top:1px solid var(--line);padding-top:10px}
+.recipes summary{cursor:pointer;font-weight:800;font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.recipes summary::-webkit-details-marker{display:none}
+.recipes summary::after{content:"+";font-size:20px;font-weight:600;color:var(--accent);transition:transform .2s}
+.recipes[open] summary::after{transform:rotate(45deg)}
+.rec{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.rec div{background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px;font-size:14px}
+.rec b{display:block;margin-bottom:2px}
+.formula{display:flex;gap:10px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 6px 6px 12px;font-size:13.5px;font-weight:600}
+.pill .chk{width:30px;height:30px;border-radius:50%}
+.pill .chk svg{width:15px;height:15px}
+
+/* stool */
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow);min-width:0}
+.stat b{display:block;font-family:var(--f-display);font-size:26px;line-height:1.1;margin-top:4px}
+.stat p{font-size:12.5px;color:var(--muted)}
+@media (max-width:480px){.grid3{gap:8px}.stat{padding:12px 10px}.stat b{font-size:21px}}
+.chart-wrap{max-width:480px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-body);font-size:11px;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.log li{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.log li:last-child{border-bottom:0}
+.log .c{width:12px;height:12px;border-radius:50%}
+.log h5{margin:0;font-size:14.5px}
+.log p{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.badge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--bad-soft);color:var(--bad);margin-left:6px;vertical-align:1px}
+.empty{text-align:center;padding:22px 10px;color:var(--muted);font-size:14px}
+
+/* foods */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-size:13px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--surface-2)}
+.chip.pause{background:var(--warn-soft);color:var(--warn);text-decoration:line-through;text-decoration-thickness:1.5px}
+.group+.group{margin-top:12px}
+.group h5{margin:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.todo{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.todo li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:10px;border-radius:var(--r-md);background:var(--surface-2)}
+.todo li.done{opacity:.7}
+.todo li.done h5{text-decoration:line-through}
+.todo h5{margin:0;font-size:14.5px}
+.todo p{font-size:13px;color:var(--muted)}
+.rules{margin:8px 0 0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+
+/* rhythm */
+.scroll-x{overflow-x:auto;margin-inline:-4px;padding-inline:4px}
+.rhythm svg{min-width:560px;width:100%;height:auto;display:block}
+.rhythm text{fill:var(--ink);font-family:var(--f-body);font-size:11px;font-weight:700}
+.rhythm .lbl{fill:var(--muted);font-weight:600;font-size:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+td:last-child{font-weight:700;white-space:nowrap}
+.flags{margin:8px 0 0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+
+/* sheet */
+.sheet-bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:40;background:rgba(10,16,12,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));max-height:88vh;max-height:88dvh;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:14px}
+@media (min-width:720px){.sheet-bg{align-items:center}.sheet{border-radius:24px}}
+@media (prefers-reduced-motion:no-preference){.sheet-bg:not([hidden]) .sheet{animation:up .28s cubic-bezier(.2,.8,.2,1)}}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.sheet h3{font-size:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field .lab{font-size:13px;font-weight:700}
+.field input[type="datetime-local"],.field input[type="text"]{font:inherit;font-size:16px;-webkit-appearance:none;appearance:none;margin:0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);width:100%;min-height:44px}
+.types{display:flex;flex-direction:column;gap:6px}
+.type{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;background:var(--surface);text-align:left}
+.type i{width:14px;height:14px;border-radius:50%;flex:none}
+.type span{flex:1;font-weight:700;font-size:14px}
+.type small{color:var(--muted);font-size:12px;font-weight:600}
+.type[aria-pressed="true"]{border-color:var(--ink);background:var(--surface-2)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:700;font-size:14px;border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;background:var(--surface);width:100%}
+.switch{width:44px;height:26px;border-radius:99px;background:var(--surface-2);position:relative;transition:background .2s;flex:none;border:1px solid var(--line)}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.toggle[aria-pressed="true"] .switch{background:var(--bad);border-color:var(--bad)}
+.toggle[aria-pressed="true"] .switch::after{transform:translateX(18px)}
+.row{display:flex;gap:10px}
+.row .btn{flex:1}
+
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+@media (min-width:720px){.toast{bottom:28px}}
+.foot{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">8м</div>
+      <div><h1>Меню малыша</h1><p class="sub">8 месяцев · на смеси · план при запорах</p></div>
+    </div>
+    <span id="sync" class="sync" title="Только на этом устройстве">Только на этом устройстве</span>
+    <nav class="tabs" role="tablist" aria-label="Разделы">
+      <button class="tab" role="tab" data-tab="today" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Сегодня</button>
+      <button class="tab" role="tab" data-tab="menu" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Меню</button>
+      <button class="tab" role="tab" data-tab="stool" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-6"/></svg>Стул</button>
+      <button class="tab" role="tab" data-tab="foods" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-2-3-7-3-8 1-1 5 3 13 8 13s9-8 8-13c-1-4-6-4-8-1z"/><path d="M12 7c0-2 1-4 3-5"/></svg>Продукты</button>
+      <button class="tab" role="tab" data-tab="rhythm" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Ритм</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="view" id="v-today" role="tabpanel"></section>
+    <section class="view" id="v-menu" role="tabpanel" hidden></section>
+    <section class="view" id="v-stool" role="tabpanel" hidden></section>
+    <section class="view" id="v-foods" role="tabpanel" hidden></section>
+    <section class="view" id="v-rhythm" role="tabpanel" hidden></section>
+  </main>
+  <p class="foot">Граммы — ориентир, а не норма. Любые сомнения по здоровью — к педиатру.</p>
+</div>
+
+<div class="sheet-bg" id="sheet" hidden>
+  <form class="sheet" id="stoolForm" aria-labelledby="sheetTitle">
+    <h3 id="sheetTitle">Запись в дневник стула</h3>
+    <div class="field">
+      <label for="f-when">Когда</label>
+      <input type="datetime-local" id="f-when" required>
+    </div>
+    <div class="field">
+      <span class="lab">Какой стул</span>
+      <div class="types" id="f-types"></div>
+    </div>
+    <button type="button" class="toggle" id="f-cry" aria-pressed="false">Плакал, было больно<span class="switch"></span></button>
+    <div class="field">
+      <label for="f-note">Заметка</label>
+      <input type="text" id="f-note" maxlength="140" placeholder="Например: после чернослива, тужился 10 минут">
+    </div>
+    <div class="row">
+      <button type="button" class="btn ghost" data-act="close-sheet">Отмена</button>
+      <button type="submit" class="btn primary">Сохранить</button>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+const DAYS=[
+{n:"Понедельник",s:"Пн",
+ b:{t:"Овсяная каша с черносливом",i:[["Овсяная каша","160 г"],["Сливочное масло","½ ч. л."],["Пюре из чернослива","40 г"]],
+   r:[["Овсяная каша","Детскую сухую кашу разведите по инструкции водой или смесью. Домашняя: 2 ст. л. (≈20 г) смолотых хлопьев на 150 мл воды, варить 5–7 минут, помешивая. Остудить до тёплой, добавить 2–3 ст. л. готовой смеси и масло."],["Пюре из чернослива","5–6 ягод без косточек залить кипятком на 10–15 минут, пробить блендером с частью этой воды. Можно размешать в каше."]]},
+ l:{t:"Брокколи, кабачок, индейка",i:[["Брокколи","80 г"],["Кабачок","70 г"],["Подсолнечное масло","1 ч. л."],["Индейка","50 г"],["Десерт: груша","40 г"]],
+   r:[["Брокколи + кабачок","Кабачок очистить и нарезать кубиками, брокколи разобрать на соцветия. На пару или в небольшом количестве воды: брокколи 10 минут, кабачок 7–10. Размять с отваром, добавить масло."],["Индейка","Филе без кожи варить 40–50 минут, измельчить блендером с бульоном. Смешать с овощами или дать отдельно."],["Груша","Спелую мягкую очистить и размять вилкой; твёрдую запечь 15–20 минут или отварить на пару 5 минут."]]},
+ d:{t:"Смесь + груша с черносливом",i:[["Смесь","150–180 мл"],["Груша с черносливом","60 г"]],
+   r:[["Груша с черносливом","Половина груши + 2–3 ягоды распаренного чернослива, размять вместе."]]}},
+{n:"Вторник",s:"Вт",
+ b:{t:"Гречка, слива, омлет с кабачком",i:[["Гречневая каша","150 г"],["Сливочное масло","½ ч. л."],["Слива","40 г"],["Омлет с кабачком","½ яйца"]],
+   r:[["Гречневая каша","Детская из пачки — по инструкции. Домашняя: 2 ст. л. гречки, смолотой в кофемолке, на 150 мл воды, варить 10–15 минут. Остудить, добавить 2–3 ст. л. смеси и масло."],["Слива","Спелую сливу обдать кипятком, снять кожуру, убрать косточку, размять. Кислую лучше отварить 3–5 минут."],["Омлет с кабачком","½ яйца + 1–2 ст. л. смеси или воды + 1 ст. л. тёртого кабачка, взбить. В маленькой форме на пару 10–15 минут или в духовке при 180 °C около 15 минут, до полной готовности. Нарезать полосками для еды руками."]]},
+ l:{t:"Тыква, цветная капуста, говядина",i:[["Тыква","80 г"],["Цветная капуста","70 г"],["Рапсовое масло","1 ч. л."],["Говядина","50 г"],["Хлеб","5 г"],["Десерт: яблоко","30 г"]],
+   r:[["Тыква + цветная капуста","Тыкву нарезать кубиками, капусту разобрать на соцветия. На пару: тыква 15 минут, капуста 10. Размять с отваром, добавить масло."],["Говядина","Кусок без жира и плёнок варить 1,5–2 часа, измельчить блендером с бульоном."],["Яблоко","Очистить, запечь 15–20 минут или отварить на пару 5 минут, размять."]]},
+ d:{t:"Смесь + кабачок",i:[["Смесь","150–180 мл"],["Кабачок","80 г"]],
+   r:[["Кабачок","На пару 7–10 минут, размять. Удобно сварить вместе с обеденными овощами и оставить порцию."]]}},
+{n:"Среда",s:"Ср",
+ b:{t:"Кукурузная каша, абрикос и груша",i:[["Кукурузная каша","160 г"],["Сливочное масло","½ ч. л."],["Абрикос","25 г"],["Груша","25 г"]],
+   r:[["Кукурузная каша","Детская из пачки — по инструкции. Домашняя: 2 ст. л. мелкой кукурузной крупы на 150 мл воды, варить 15 минут, постоянно помешивая (легко пригорает). Остудить, добавить смесь и масло."],["Абрикос + груша","Абрикос обдать кипятком, снять кожуру и косточку. Вне сезона — баночка или распаренная курага (2–3 штуки в кипятке 15 минут). Размять вместе с грушей."]]},
+ l:{t:"Свёкла, кабачок, картофель, кролик",i:[["Свёкла","50 г"],["Кабачок","60 г"],["Картофель","40 г"],["Кукурузное масло","1 ч. л."],["Кролик","50 г"],["Десерт: чернослив","30 г"]],
+   r:[["Свёкла + кабачок + картофель","Свёклу варить целиком в кожуре 40–60 минут или запечь в фольге (удобно сделать заранее). Картофель варить 15 минут, кабачок 7–10. Размять вместе с отваром, добавить масло. Стул от свёклы может покраснеть — это нормально."],["Кролик","Варить 50–60 минут, снять с костей (внимательно, они мелкие), измельчить блендером с бульоном."],["Чернослив","4 ягоды залить кипятком на 10–15 минут, пробить блендером."]]},
+ d:{t:"Смесь + слива",i:[["Смесь","150–180 мл"],["Слива","50 г"]],
+   r:[["Слива","Без кожуры и косточки, размять — как во вторник."]]}},
+{n:"Четверг",s:"Чт",
+ b:{t:"Мультизлаковая каша, черника, авокадо",i:[["Мультизлаковая каша","160 г"],["Сливочное масло","½ ч. л."],["Черника","30 г"],["Авокадо","20 г"]],
+   r:[["Мультизлаковая каша","Детская из пачки, развести по инструкции водой или смесью. Проверьте состав: лучше без риса первым в списке."],["Черника","Свежую или размороженную раздавить вилкой и размешать в каше. Целые ягоды не давать — можно подавиться."],["Авокадо","Спелое, мягкое: размять вилкой или нарезать полосками для еды руками. Готовить не нужно."]]},
+ l:{t:"Брокколи, горошек, кабачок, курица",i:[["Брокколи","80 г"],["Горошек","30 г"],["Кабачок","40 г"],["Подсолнечное масло","1 ч. л."],["Курица","50 г"],["Десерт: персик","40 г"]],
+   r:[["Брокколи + горошек + кабачок","Замороженный горошек варить 10 минут, брокколи 10, кабачок 7–10. Горошек обязательно пробить блендером или протереть — целые горошины могут попасть в дыхательные пути. Добавить масло."],["Курица","Филе грудки или бедра без кожи варить 30–40 минут, измельчить блендером с бульоном."],["Персик","Спелый обдать кипятком, снять кожуру, убрать косточку, размять. Вне сезона — баночка."]]},
+ d:{t:"Смесь + овсяная каша",i:[["Смесь","150–180 мл"],["Овсяная каша","80–100 г"]],
+   r:[["Овсяная каша","Как в понедельник, но половина порции и без фруктов."]]}},
+{n:"Пятница",s:"Пт",
+ b:{t:"Овсянка, слива с черносливом, омлет",i:[["Овсяная каша","150 г"],["Сливочное масло","½ ч. л."],["Слива","25 г"],["Чернослив","25 г"],["Омлет с брокколи","½ яйца"]],
+   r:[["Овсяная каша","Детская из пачки или 2 ст. л. смолотых хлопьев на 150 мл воды, 5–7 минут, затем смесь и масло."],["Слива + чернослив","Сливу без кожуры и косточки и 3 распаренные ягоды чернослива пробить вместе."],["Омлет с брокколи","1–2 соцветия брокколи отварить 5 минут и мелко нарезать. ½ яйца + 1–2 ст. л. смеси или воды взбить, смешать с брокколи. На пару 10–15 минут или в духовке при 180 °C около 15 минут."]]},
+ l:{t:"Кабачок, морковь, печень",i:[["Кабачок","100 г"],["Морковь","50 г"],["Рапсовое масло","1 ч. л."],["Печень говяжья","30–40 г"],["Хлеб","5 г"],["Десерт: груша","40 г"]],
+   r:[["Кабачок + морковь","Морковь варить 20 минут, кабачок добавить за 10 минут до конца. Размять с отваром, добавить масло. Кабачка больше, чем моркови: морковь может крепить."],["Печень говяжья","Очистить от плёнок и протоков, нарезать, варить 15–20 минут (если переварить, станет жёсткой). Измельчить блендером с овощным отваром. Не чаще раза в неделю."],["Груша","Спелую очистить и размять, твёрдую запечь или отварить на пару 5 минут."]]},
+ d:{t:"Смесь + яблоко с абрикосом",i:[["Смесь","150–180 мл"],["Яблоко с абрикосом","60 г"]],
+   r:[["Яблоко с абрикосом","Яблоко запечь или отварить, абрикос без кожуры (или распаренная курага), размять вместе."]]}},
+{n:"Суббота",s:"Сб",
+ b:{t:"Гречка, груша с малиной",i:[["Гречневая каша","160 г"],["Сливочное масло","½ ч. л."],["Груша","30 г"],["Малина","15 г"]],
+   r:[["Гречневая каша","Как во вторник: детская из пачки или 2 ст. л. смолотой гречки на 150 мл воды, 10–15 минут, затем смесь и масло."],["Груша + малина","Малину протереть через сито, чтобы убрать косточки, или взять баночку. Смешать с размятой грушей."]]},
+ l:{t:"Цветная капуста, тыква, телятина",i:[["Цветная капуста","80 г"],["Тыква","70 г"],["Подсолнечное масло","1 ч. л."],["Телятина","50 г"],["Десерт: абрикос","40 г"]],
+   r:[["Цветная капуста + тыква","Тыкву кубиками и соцветия капусты на пару: тыкву 15 минут, капусту 10. Размять с отваром, добавить масло. Сразу сварите лишние 80 г тыквы на ужин."],["Телятина","Кусок без жира и плёнок варить 1,5 часа, измельчить блендером с бульоном."],["Абрикос","Обдать кипятком, снять кожуру и косточку, размять. Вне сезона — баночка или 2–3 распаренные кураги."]]},
+ d:{t:"Смесь + тыква",i:[["Смесь","150–180 мл"],["Тыква","80 г"]],
+   r:[["Тыква","Тыква, сваренная в обед, размять и разогреть до тёплой."]]}},
+{n:"Воскресенье",s:"Вс",
+ b:{t:"Пшеничная каша, персик, омлет с тыквой",i:[["Пшеничная каша","150 г"],["Сливочное масло","½ ч. л."],["Персик","30 г"],["Клубника","15 г"],["Омлет с тыквой","½ яйца"]],
+   r:[["Пшеничная каша","Детская из пачки — по инструкции. Домашняя: 2 ст. л. мелкой пшеничной крупы на 150 мл воды, варить 10–15 минут, помешивая. Остудить, добавить смесь и масло."],["Персик + клубника","Персик без кожуры и косточки размять. Клубнику (1–2 ягоды) промыть, раздавить вилкой и смешать."],["Омлет с тыквой","1 ст. л. мелко натёртой сырой тыквы + ½ яйца + 1–2 ст. л. смеси или воды, взбить. На пару 15 минут или в духовке при 180 °C около 15 минут, до полной готовности."]]},
+ l:{t:"Свёкла, кабачок, индейка",i:[["Свёкла","50 г"],["Кабачок","100 г"],["Кукурузное масло","1 ч. л."],["Индейка","50 г"],["Десерт: груша с черносливом","50 г"]],
+   r:[["Свёкла + кабачок","Свёклу варить целиком 40–60 минут или взять заготовленную заранее (хранится в холодильнике до 2 дней). Кабачок на пару 7–10 минут. Размять вместе, добавить масло."],["Индейка","Филе варить 40–50 минут, измельчить с бульоном. Можно взять замороженные кубики."],["Груша + чернослив","Половину груши размять, добавить 2–3 распаренные ягоды чернослива, пробить."]]},
+ d:{t:"Смесь + персик",i:[["Смесь","150–180 мл"],["Персик","50 г"]],
+   r:[["Персик","Без кожуры и косточки, размять вилкой."]]}}
+];
+const SLOTS=[
+ {k:"m",time:"07:00",name:"Утренняя смесь",sub:"Подъём"},
+ {k:"b",time:"09:30",name:"Завтрак"},
+ {k:"l",time:"13:30",name:"Обед"},
+ {k:"d",time:"17:30",name:"Ужин"},
+ {k:"n",time:"20:30",name:"Смесь перед сном",sub:"Сон"}
+];
+const ST=[null,
+ {n:"Твёрдые шарики",d:"сильный запор",c:"var(--bad)"},
+ {n:"Плотный, большой",d:"запор",c:"var(--warn)"},
+ {n:"Мягкий, как паста",d:"норма",c:"var(--ok)"},
+ {n:"Кашица",d:"норма",c:"var(--ok)"},
+ {n:"Жидкий",d:"слишком мягко",c:"var(--info)"}];
+const FOOD_GROUPS=[
+ ["Фрукты и ягоды",["яблоко","груша","чернослив","абрикос","слива","персик","смородина","черника","клубника","малина","манго","авокадо","банан"]],
+ ["Овощи",["брокколи","кабачок","цветная капуста","тыква","морковь","картофель","капуста","горох","свёкла","кукуруза"]],
+ ["Мясо и яйцо",["кролик","индейка","говядина","телятина","курица","печень говяжья","яйцо"]],
+ ["Крупы и хлеб",["гречневая","кукурузная","овсяная","пшеничная","мультизлаковая","рисовая","хлеб"]],
+ ["Масла и молочное",["подсолнечное","кукурузное","рапсовое","сливочное","творог"]]];
+const PAUSED=["банан","рисовая","творог"];
+const NEXT=[
+ ["fish","Белая морская рыба","Треска, хек, минтай. 1–2 раза в неделю вместо мяса в обед. Варить 10–15 минут, тщательно убрать кости."],
+ ["lentil","Красная чечевица","Много клетчатки и железа. Разварить, по 1 ложке к овощам. Может давать газы — начинать с малого."],
+ ["olive","Оливковое масло","1 ч. л. в овощи, чередовать с другими маслами."],
+ ["peanut","Арахисовая паста","Раннее введение снижает риск аллергии. Только паста, разведённая водой или в каше, начиная с кончика ложки. Целые орехи нельзя."],
+ ["kiwi","Киви","Помогает при запорах. Спелый, размять, начать с 1 ч. л. Возможно покраснение вокруг рта."],
+ ["batat","Батат","Мягкий сладкий вкус, хорошо идёт с мясом."],
+ ["chick","Нут","Разварить и протереть, как чечевицу."],
+ ["texture","Кусочки вместо пюре","Разминать вилкой, давать мягкие кусочки в руки. Комочки важно освоить до 10 месяцев."]];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const dow=d=>(d.getDay()+6)%7;
+function dateForDow(i){const t=new Date();t.setHours(12,0,0,0);t.setDate(t.getDate()-dow(t)+i);return t}
+const MONTHS=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+const CHECK_SVG='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const LS="baby-menu-v1";
+const state={checks:{},stool:[],foods:{}};
+let db=null, ui={tab:"today",menuDay:dow(new Date()),type:3,cry:false};
+try{const j=JSON.parse(localStorage.getItem(LS)||"null");if(j){state.checks=j.checks||{};state.stool=j.stool||[];state.foods=j.foods||{}}}catch(e){}
+try{const t=localStorage.getItem(LS+"-tab");if(t)ui.tab=t}catch(e){}
+function saveLocal(){if(db)return;try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+
+let toastT;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200)}
+function onErr(e){
+  const c=e&&e.code;
+  if(c==="invalid_argument")toast("Нет прав на сохранение в этом просмотре");
+  else if(c==="quota_exceeded")toast("Место для записей закончилось: удалите старые");
+  else toast("Не удалось сохранить, попробуйте ещё раз");
+}
+const queues={};
+function write(path,fn){const p=(queues[path]||Promise.resolve()).then(fn).catch(onErr);queues[path]=p;return p}
+
+/* ---------- actions ---------- */
+function setCheck(k,slot,val){
+  state.checks[k]=Object.assign({},state.checks[k],{[slot]:val});
+  render();saveLocal();
+  if(db)write("checks/"+k,()=>db.doc("checks/"+k).set(Object.assign({},state.checks[k])));
+}
+function setWater(k,v){
+  v=Math.max(0,Math.min(400,v));
+  state.checks[k]=Object.assign({},state.checks[k],{water:v});
+  render();saveLocal();
+  if(db)write("checks/"+k,()=>db.doc("checks/"+k).set(Object.assign({},state.checks[k])));
+}
+function addStool(entry){
+  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  state.stool.push(Object.assign({id},entry));
+  render();saveLocal();
+  if(db)write("stool/"+id,()=>db.doc("stool/"+id).set(entry));
+}
+function delStool(id){
+  state.stool=state.stool.filter(s=>s.id!==id);
+  render();saveLocal();
+  if(db)write("stool/"+id,()=>db.doc("stool/"+id).delete());
+}
+function toggleFood(k){
+  state.foods=Object.assign({},state.foods,{[k]:!state.foods[k]});
+  render();saveLocal();
+  if(db)write("foods/state",()=>db.doc("foods/state").set(Object.assign({},state.foods)));
+}
+
+/* ---------- helpers ---------- */
+function dayDone(k){const c=state.checks[k]||{};return SLOTS.filter(s=>c[s.k]).length}
+function sortedStool(){return state.stool.slice().sort((a,b)=>b.ts-a.ts)}
+function startOfDay(d){const x=new Date(d);x.setHours(0,0,0,0);return x}
+function fmtWhen(ts){
+  const d=new Date(ts),today=startOfDay(new Date()),dd=startOfDay(d);
+  const diff=Math.round((today-dd)/864e5);
+  const t=pad(d.getHours())+":"+pad(d.getMinutes());
+  if(diff===0)return"сегодня, "+t;
+  if(diff===1)return"вчера, "+t;
+  return d.getDate()+" "+MONTHS[d.getMonth()]+", "+t;
+}
+function stoolStatus(){
+  const list=sortedStool();
+  if(!list.length)return{cls:"info",h:"Дневник стула пуст",p:"Отмечайте каждый стул: так вы и педиатр увидите, помогает ли питание."};
+  const days=Math.round((startOfDay(new Date())-startOfDay(new Date(list[0].ts)))/864e5);
+  if(days>=5)return{cls:"bad",h:"Стула нет "+days+" дн.",p:"Нужно показаться педиатру. Срочно — если вздут живот, рвота, кровь или ребёнок вялый."};
+  const last=list.slice(0,3);
+  const hard=last.filter(s=>s.type<=2).length, cry=last.filter(s=>s.cry).length;
+  if(days>=3)return{cls:"warn",h:"Стула нет "+days+" дн.",p:"Больше чернослива, груши, сливы, воды; массаж живота, «велосипед», тёплая ванна."};
+  if(hard>=2||cry>=2)return{cls:"warn",h:"Стул всё ещё твёрдый или болезненный",p:"Питание помогает медленно. Стоит обсудить с педиатром курс лактулозы или макрогола."};
+  if(list[0].type<=2||list[0].cry)return{cls:"warn",h:"Последний стул "+(list[0].cry?"был болезненным":"твёрдый"),p:"Чернослив, груша, слива, вода, массаж живота. Если повторится — к педиатру."};
+  if(list[0].type===5)return{cls:"info",h:"Последний стул жидкий",p:"Уменьшите чернослив и другие «слабящие» фрукты. Если повторяется — к педиатру."};
+  return{cls:"ok",h:"Стул в норме",p:"Продолжайте текущее питание и воду."};
+}
+function alertHTML(s){return'<div class="alert '+s.cls+'"><span class="dot"></span><div><h4>'+esc(s.h)+'</h4><p>'+esc(s.p)+'</p></div></div>'}
+function chk(attrs,on,label){return'<button class="chk" '+attrs+' aria-pressed="'+(on?"true":"false")+'" aria-label="'+esc(label)+'">'+CHECK_SVG+'</button>'}
+function itemsHTML(items){return'<ul class="items">'+items.map(i=>'<li><span>'+esc(i[0])+'</span><span class="num">'+esc(i[1])+'</span></li>').join("")+'</ul>'}
+
+/* ---------- views ---------- */
+function renderToday(){
+  const now=new Date(),k=keyOf(now),di=dow(now),D=DAYS[di],c=state.checks[k]||{};
+  const done=dayDone(k),C=2*Math.PI*42,off=C*(1-done/5);
+  const water=c.water||0;
+  const last=sortedStool()[0];
+  let h='<div class="card hero"><div><p class="eyebrow">Сегодня</p><h2>'+D.n+', '+now.getDate()+' '+MONTHS[now.getMonth()]+'</h2><p class="muted">'+(done===5?"Все кормления отмечены":"Отмечено кормлений: "+done+" из 5")+'</p></div>'+
+   '<div class="ring" aria-label="'+done+' из 5"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="42" fill="none" stroke-width="10"/><circle class="val" cx="50" cy="50" r="42" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/></svg><b class="num">'+done+'/5</b></div></div>';
+  h+=alertHTML(stoolStatus());
+  h+='<div class="grid2"><div class="card"><p class="eyebrow">Вода сверх смеси</p><div class="water-row"><div class="water-val num">'+water+' <span>из 200 мл</span></div><div class="stepper"><button class="btn round" data-act="water" data-d="-50" aria-label="Минус 50 мл">−</button><button class="btn round primary" data-act="water" data-d="50" aria-label="Плюс 50 мл">+</button></div></div><div class="drops">'+
+   [0,1,2,3].map(i=>'<span class="drop"><i style="width:'+Math.max(0,Math.min(100,(water-i*50)*2))+'%"></i></span>').join("")+'</div></div>'+
+   '<div class="card"><p class="eyebrow">Стул</p><p style="margin-top:10px;font-weight:700">'+(last?esc(ST[last.type].n)+(last.cry?' <span class="badge">плакал</span>':''):'Записей пока нет')+'</p><p class="muted" style="font-size:13px">'+(last?esc(fmtWhen(last.ts)):'Добавьте первую запись')+'</p><button class="btn primary block" style="margin-top:12px" data-act="open-sheet">+ Записать стул</button></div></div>';
+  h+='<h3 class="sec-title">План на день</h3><ol class="tl">';
+  SLOTS.forEach(s=>{
+    const on=!!c[s.k],meal="bld".includes(s.k)?D[s.k]:null;
+    h+='<li class="slot'+(on?" done":"")+'"><div class="t num">'+s.time+(s.sub?'<small>'+s.sub+'</small>':'')+'</div><div style="min-width:0"><h4>'+s.name+'</h4>';
+    if(meal){h+='<p class="what">'+esc(meal.t)+'</p><details data-d="t-'+s.k+'"><summary>Состав и граммы</summary>'+itemsHTML(meal.i)+'</details>'}
+    else h+='<p class="what">Смесь 180–200 мл</p>';
+    h+='</div>'+chk('data-act="check" data-k="'+k+'" data-s="'+s.k+'"',on,s.name+": отметить")+'</li>';
+  });
+  h+='</ol>';
+  $("#v-today").innerHTML=h;
+}
+function renderMenu(){
+  const di=ui.menuDay,D=DAYS[di],date=dateForDow(di),k=keyOf(date),c=state.checks[k]||{},todayI=dow(new Date());
+  let h='<div class="days" role="group" aria-label="День недели">';
+  DAYS.forEach((d,i)=>{
+    const dk=keyOf(dateForDow(i)),cc=state.checks[dk]||{};
+    h+='<button class="day'+(i===todayI?" today":"")+'" data-act="day" data-i="'+i+'" aria-pressed="'+(i===di)+'">'+d.s+'<small class="num">'+dateForDow(i).getDate()+'</small><span class="pips">'+SLOTS.map(s=>'<i class="'+(cc[s.k]?"on":"")+'"></i>').join("")+'</span></button>';
+  });
+  h+='</div><div><p class="eyebrow">'+(di===todayI?"Сегодня":"Эта неделя")+'</p><h2 style="font-size:24px;margin-top:2px">'+D.n+'</h2></div>';
+  h+='<div class="formula">'+["m","n"].map(sk=>{const s=SLOTS.find(x=>x.k===sk);return'<span class="pill">'+s.time+' · смесь 180–200 мл'+chk('data-act="check" data-k="'+k+'" data-s="'+sk+'"',!!c[sk],s.name)+'</span>'}).join("")+'</div>';
+  [["b","Завтрак","09:30"],["l","Обед","13:30"],["d","Ужин","17:30"]].forEach(([sk,name,time])=>{
+    const m=D[sk];
+    h+='<article class="card meal"><div class="meal-head"><div style="min-width:0"><span class="tag '+sk+'">'+name+' · '+time+'</span><h3>'+esc(m.t)+'</h3></div>'+chk('data-act="check" data-k="'+k+'" data-s="'+sk+'"',!!c[sk],name+": съели")+'</div>'+itemsHTML(m.i)+
+     '<details class="recipes" data-d="r-'+di+sk+'"><summary>Как готовить</summary><div class="rec">'+m.r.map(r=>'<div><b>'+esc(r[0])+'</b>'+esc(r[1])+'</div>').join("")+'</div></details></article>';
+  });
+  $("#v-menu").innerHTML=h;
+}
+function chartSVG(){
+  const W=360,H=215,L=60,R=10,T=12,PH=150,days=14,step=(W-L-R)/(days-1);
+  const y=t=>T+(5-t)*(PH/4);
+  const today=startOfDay(new Date());
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Консистенция стула за 14 дней">';
+  s+='<rect x="'+L+'" y="'+y(4)+'" width="'+(W-L-R)+'" height="'+(y(3)-y(4))+'" fill="var(--ok-soft)" rx="6"/>';
+  const yl=["","шарики","плотный","мягкий","кашица","жидкий"];
+  for(let t=1;t<=5;t++){s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="var(--line)" stroke-dasharray="2 4"/><text x="'+(L-8)+'" y="'+(y(t)+3.5)+'" text-anchor="end">'+yl[t]+'</text>'}
+  const byDay={};
+  state.stool.forEach(e=>{const dd=Math.round((today-startOfDay(new Date(e.ts)))/864e5);if(dd>=0&&dd<days)(byDay[dd]=byDay[dd]||[]).push(e)});
+  for(let i=0;i<days;i++){
+    const dd=days-1-i,x=L+i*step,d=new Date(today);d.setDate(d.getDate()-dd);
+    s+='<text x="'+x+'" y="'+(T+PH+20)+'" text-anchor="middle"'+(dd===0?' style="fill:var(--ink);font-weight:800"':'')+'>'+d.getDate()+'</text>';
+    if(!byDay[dd]){s+='<circle cx="'+x+'" cy="'+(T+PH+32)+'" r="2" fill="var(--line)"/>';continue}
+    const arr=byDay[dd].sort((a,b)=>a.ts-b.ts),n=arr.length;
+    arr.forEach((e,j)=>{const ox=(j-(n-1)/2)*7,cx=x+ox,cy=y(e.type);
+      if(e.cry)s+='<circle cx="'+cx+'" cy="'+cy+'" r="8.5" fill="none" stroke="var(--bad)" stroke-width="1.5"/>';
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="5.5" fill="'+ST[e.type].c+'" stroke="var(--surface)" stroke-width="1.5"><title>'+esc(ST[e.type].n+", "+fmtWhen(e.ts))+'</title></circle>'});
+  }
+  return s+'</svg>';
+}
+function renderStool(){
+  const list=sortedStool(),today=startOfDay(new Date());
+  const days=list.length?Math.round((today-startOfDay(new Date(list[0].ts)))/864e5):null;
+  const week=list.filter(e=>(today-startOfDay(new Date(e.ts)))/864e5<7);
+  const soft=week.length?Math.round(100*week.filter(e=>e.type===3||e.type===4).length/week.length):null;
+  let h='<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap"><div><p class="eyebrow">Дневник</p><h2 style="font-size:24px;margin-top:2px">Стул и самочувствие</h2></div><button class="btn primary" data-act="open-sheet">+ Новая запись</button></div>';
+  h+=alertHTML(stoolStatus());
+  h+='<div class="grid3"><div class="stat"><p>С последнего</p><b class="num">'+(days===null?"—":days===0?"сегодня":days+" дн.")+'</b></div><div class="stat"><p>За 7 дней</p><b class="num">'+week.length+'</b></div><div class="stat"><p>Мягкий стул</p><b class="num">'+(soft===null?"—":soft+"%")+'</b></div></div>';
+  h+='<div class="card chart"><p class="eyebrow">Последние 14 дней</p><div class="chart-wrap" style="margin-top:10px">'+chartSVG()+'</div><div class="legend"><span><i style="background:var(--ok-soft);border-radius:3px;width:16px"></i>зона нормы</span><span><i style="background:var(--bad)"></i>шарики</span><span><i style="background:var(--warn)"></i>плотный</span><span><i style="background:var(--ok)"></i>мягкий</span><span><i style="background:var(--info)"></i>жидкий</span><span><i style="border:1.5px solid var(--bad);background:transparent"></i>плакал</span></div></div>';
+  h+='<div class="card"><p class="eyebrow">Записи</p>';
+  if(!list.length)h+='<div class="empty">Здесь появятся записи. Нажмите «Новая запись» после очередного подгузника.</div>';
+  else h+='<ul class="log">'+list.slice(0,40).map(e=>'<li><span class="c" style="background:'+ST[e.type].c+'"></span><div style="min-width:0"><h5>'+esc(ST[e.type].n)+(e.cry?'<span class="badge">плакал</span>':'')+'</h5><p>'+esc(fmtWhen(e.ts))+' · '+esc(ST[e.type].d)+(e.note?' · '+esc(e.note):'')+'</p></div><button class="btn ghost danger" data-act="del" data-id="'+esc(e.id)+'" aria-label="Удалить запись">Удалить</button></li>').join("")+'</ul>';
+  h+='</div><div class="card"><p class="eyebrow">Срочно к врачу, если</p><ul class="flags"><li>кровь в стуле или на подгузнике</li><li>рвота, особенно зелёная</li><li>вздутый твёрдый живот, вялость, плач без остановки</li><li>нет стула больше 5 дней</li><li>отказ от еды, температура</li></ul></div>';
+  $("#v-stool").innerHTML=h;
+}
+function renderFoods(){
+  let h='<div><p class="eyebrow">Рацион</p><h2 style="font-size:24px;margin-top:2px">Продукты</h2></div>';
+  const doneN=NEXT.filter(n=>state.foods[n[0]]).length;
+  h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><h3 style="font-size:17px">Что ввести дальше</h3><span class="muted num" style="font-size:13px;font-weight:700">'+doneN+' из '+NEXT.length+'</span></div><p class="muted" style="font-size:13.5px;margin-top:4px">По одному новому продукту в 2–3 дня, утром или днём, с 1 чайной ложки.</p><ul class="todo">'+
+    NEXT.map(n=>{const on=!!state.foods[n[0]];return'<li class="'+(on?"done":"")+'">'+chk('data-act="food" data-f="'+n[0]+'"',on,n[1]+": введено")+'<div><h5>'+esc(n[1])+'</h5><p>'+esc(n[2])+'</p></div></li>'}).join("")+'</ul></div>';
+  h+='<div class="card"><h3 style="font-size:17px">Уже введено</h3><p class="muted" style="font-size:13.5px;margin-top:4px">Зачёркнуты продукты на паузе из-за запоров (2–3 недели).</p>'+
+    FOOD_GROUPS.map(g=>'<div class="group" style="margin-top:12px"><h5>'+g[0]+'</h5><div class="chips">'+g[1].map(f=>'<span class="chip'+(PAUSED.includes(f)?" pause":"")+'">'+esc(f)+'</span>').join("")+'</div></div>').join("")+'</div>';
+  h+='<div class="grid2"><div class="card"><h3 style="font-size:17px">Смягчают стул</h3><ul class="rules"><li>чернослив, груша, слива, абрикос, персик</li><li>свёкла, кабачок, брокколи, цветная капуста</li><li>овсяная, гречневая, кукурузная каши</li><li>растительное масло, вода</li></ul></div><div class="card"><h3 style="font-size:17px">Пока нельзя</h3><ul class="rules"><li>мёд — до года</li><li>соль и сахар</li><li>коровье молоко как питьё — до года</li><li>целые орехи, виноград, твёрдые сырые овощи</li><li>тунец, рыба-меч, акула</li></ul></div></div>';
+  $("#v-foods").innerHTML=h;
+}
+function renderRhythm(){
+  const W=720,H=150,L=16,R=16,x=t=>L+(t-6)/(22-6)*(W-L-R);
+  const blocks=[[6,7,"night"],[10,11.5,"nap"],[14.5,16,"nap"],[20.5,22,"night"]];
+  const feeds=[[7,"Смесь","m"],[9.5,"Завтрак","b"],[13.5,"Обед","l"],[17.5,"Ужин","d"],[20.5,"Смесь","n"]];
+  const col={m:"var(--info)",b:"var(--apricot)",l:"var(--accent)",d:"var(--plum)",n:"var(--info)"};
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Ритм дня: сон и кормления"><rect x="'+L+'" y="60" width="'+(W-L-R)+'" height="34" rx="10" fill="var(--surface-2)"/>';
+  blocks.forEach(b=>{s+='<rect x="'+x(b[0])+'" y="60" width="'+(x(b[1])-x(b[0]))+'" height="34" rx="8" fill="'+(b[2]==="nap"?"var(--accent-soft)":"var(--info-soft)")+'"/>';
+    if(b[2]==="nap")s+='<text class="lbl" x="'+((x(b[0])+x(b[1]))/2)+'" y="81" text-anchor="middle">сон</text>'});
+  for(let t=6;t<=22;t+=2)s+='<text class="lbl" x="'+x(t)+'" y="'+(H-14)+'" text-anchor="middle">'+pad(t)+':00</text><line x1="'+x(t)+'" x2="'+x(t)+'" y1="98" y2="'+(H-28)+'" stroke="var(--line)"/>';
+  feeds.forEach((f,i)=>{const fx=x(f[0]),up=i%2===0;s+='<line x1="'+fx+'" x2="'+fx+'" y1="'+(up?32:94)+'" y2="'+(up?60:112)+'" stroke="'+col[f[2]]+'" stroke-width="2"/><circle cx="'+fx+'" cy="77" r="7" fill="'+col[f[2]]+'" stroke="var(--surface)" stroke-width="2"/>'+
+    '<text x="'+fx+'" y="'+(up?18:126)+'" text-anchor="middle">'+f[1]+'</text><text class="lbl" x="'+fx+'" y="'+(up?30:138)+'" text-anchor="middle">'+(f[0]%1?Math.floor(f[0])+":30":pad(f[0])+":00")+'</text>'});
+  s+='</svg>';
+  let h='<div><p class="eyebrow">Режим</p><h2 style="font-size:24px;margin-top:2px">Ритм дня</h2></div>';
+  h+='<div class="card rhythm"><p class="eyebrow">Кормления и сон, примерно</p><div class="scroll-x" style="margin-top:10px">'+s+'</div><p class="muted" style="font-size:13px;margin-top:8px">Окна бодрствования 2,5–3 часа, два дневных сна. Сдвигайте всё под свой ритм, сохраняя промежутки.</p></div>';
+  h+='<div class="grid2"><div class="card"><h3 style="font-size:17px">Порции за приём</h3><div class="scroll-x"><table><thead><tr><th>Продукт</th><th>Объём</th></tr></thead><tbody>'+
+   [["Каша","150–170 г"],["Овощи","150 г"],["Мясо","50 г"],["Фрукты","30–50 г"],["Масло растительное","1 ч. л."],["Масло сливочное","½–1 ч. л."],["Яйцо (3 раза в неделю)","½ шт."],["Хлеб","5 г"]].map(r=>'<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td></tr>').join("")+
+   '</tbody></table></div></div><div class="card"><h3 style="font-size:17px">За весь день</h3><div class="scroll-x"><table><thead><tr><th>Что</th><th>Объём</th></tr></thead><tbody>'+
+   [["Смесь как питьё","500–600 мл"],["Вода","100–200 мл"],["Овощи","150–250 г"],["Фрукты","100–150 г"],["Мясо","50–60 г"],["Всего еды","1000–1100 г"],["Сон","12–15 ч"]].map(r=>'<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td></tr>').join("")+
+   '</tbody></table></div></div></div>';
+  h+='<div class="card"><h3 style="font-size:17px">Заготовки</h3><ul class="rules"><li>Мясо и печень: сварить, измельчить, заморозить в формочках для льда (кубик ≈25 г, хранится до месяца). На обед — 2 кубика.</li><li>Овощи: варить на 1–2 дня вперёд, хранить в холодильнике в закрытом контейнере.</li><li>Размораживать в холодильнике с вечера, повторно не замораживать.</li><li>Открытая баночка — не больше суток в холодильнике, порцию откладывать чистой ложкой.</li></ul></div>';
+  $("#v-rhythm").innerHTML=h;
+}
+/* keep <details> that the user opened open across re-renders */
+const openD={};
+document.addEventListener("toggle",e=>{const d=e.target;if(d&&d.tagName==="DETAILS"&&d.dataset.d){if(d.open)openD[d.dataset.d]=1;else delete openD[d.dataset.d]}},true);
+function restoreOpen(){document.querySelectorAll("details[data-d]").forEach(d=>{if(openD[d.dataset.d])d.open=true})}
+function render(){renderToday();renderMenu();renderStool();renderFoods();restoreOpen()}
+
+/* ---------- tabs & events ---------- */
+function showTab(t){
+  ui.tab=t;try{localStorage.setItem(LS+"-tab",t)}catch(e){}
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false"));
+  document.querySelectorAll(".view").forEach(v=>v.hidden=v.id!=="v-"+t);
+  window.scrollTo(0,0);
+}
+function openSheet(){
+  const d=new Date();d.setSeconds(0,0);
+  $("#f-when").value=keyOf(d)+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
+  $("#f-note").value="";ui.type=3;ui.cry=false;drawTypes();
+  $("#f-cry").setAttribute("aria-pressed","false");
+  $("#sheet").hidden=false;
+}
+function drawTypes(){
+  $("#f-types").innerHTML=[1,2,3,4,5].map(t=>'<button type="button" class="type" data-act="type" data-t="'+t+'" aria-pressed="'+(ui.type===t)+'"><i style="background:'+ST[t].c+'"></i><span>'+ST[t].n+'</span><small>'+ST[t].d+'</small></button>').join("");
+}
+const pendingDel={};
+document.addEventListener("click",e=>{
+  const tabB=e.target.closest(".tab");if(tabB){showTab(tabB.dataset.tab);return}
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const a=b.dataset.act;
+  if(a==="check")setCheck(b.dataset.k,b.dataset.s,b.getAttribute("aria-pressed")!=="true");
+  else if(a==="water"){const k=keyOf(new Date());setWater(k,((state.checks[k]||{}).water||0)+Number(b.dataset.d))}
+  else if(a==="day"){ui.menuDay=Number(b.dataset.i);renderMenu();restoreOpen()}
+  else if(a==="food")toggleFood(b.dataset.f);
+  else if(a==="open-sheet")openSheet();
+  else if(a==="close-sheet")$("#sheet").hidden=true;
+  else if(a==="type"){ui.type=Number(b.dataset.t);drawTypes()}
+  else if(a==="del"){
+    const id=b.dataset.id;
+    if(pendingDel[id]){delete pendingDel[id];delStool(id);toast("Запись удалена")}
+    else{pendingDel[id]=1;b.textContent="Точно?";setTimeout(()=>{if(pendingDel[id]){delete pendingDel[id];b.textContent="Удалить"}},3000)}
+  }
+});
+$("#f-cry").addEventListener("click",function(){ui.cry=!ui.cry;this.setAttribute("aria-pressed",String(ui.cry))});
+$("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet")$("#sheet").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#sheet").hidden=true});
+$("#stoolForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const v=$("#f-when").value,ts=v?new Date(v).getTime():Date.now();
+  addStool({ts:isNaN(ts)?Date.now():ts,type:ui.type,cry:ui.cry,note:$("#f-note").value.trim().slice(0,140)});
+  $("#sheet").hidden=true;toast("Записано");
+});
+
+/* ---------- boot ---------- */
+const TABS=["today","menu","stool","foods","rhythm"],hashTab=(location.hash||"").slice(1);
+renderRhythm();render();showTab(TABS.includes(hashTab)?hashTab:TABS.includes(ui.tab)?ui.tab:"today");
+(async()=>{
+  try{
+    const c=window.claude;if(!c||!c.use)return;
+    const d=await c.use("db");if(!d)return;
+    db=d;
+    const s=$("#sync");s.textContent="Синхронизация между устройствами";s.title=s.textContent;s.classList.add("on");
+    db.collection("checks").onSnapshot(snap=>{const o={};snap.docs.forEach(x=>{o[x.id]=Object.assign({},x.data())});state.checks=o;render()},onErr);
+    db.collection("stool").onSnapshot(snap=>{state.stool=snap.docs.map(x=>Object.assign({id:x.id},x.data()));render()},onErr);
+    db.doc("foods/state").onSnapshot(x=>{state.foods=x.exists?Object.assign({},x.data()):{};render()},onErr);
+  }catch(e){}
+})();
+// offline cache for the hosted version (ignored where service workers are unavailable)
+try{if("serviceWorker" in navigator&&location.protocol==="https:"&&window.self===window.top)navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}
+// refresh "today" after midnight
+setInterval(()=>{const k=keyOf(new Date());if(k!==renderToday.k){renderToday.k=k;render()}},60000);renderToday.k=keyOf(new Date());
+})();
+</script>
+</body>
+</html>
