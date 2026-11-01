@@ -1,6 +1,6 @@
 /* Offline cache: the page itself is fetched network-first so updates arrive,
    icons and manifest cache-first. */
-var CACHE = "baby-menu-v1";
+var CACHE = "baby-menu-v2";
 var ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", function (e) {

@@ -268,6 +268,34 @@ td:last-child{font-weight:700;white-space:nowrap}
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
 @media (min-width:720px){.toast{bottom:28px}}
 .foot{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px}
+
+/* menu: mode switch, week nav, prep list */
+.seg,.range{display:flex;gap:4px;background:var(--surface-2);border-radius:14px;padding:4px}
+.sbtn,.rbtn{flex:1;border:0;background:transparent;border-radius:10px;padding:9px 10px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;min-height:40px}
+.sbtn[aria-pressed="true"],.rbtn[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.weeknav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.weeknav>div{text-align:center;display:flex;flex-direction:column}
+.weeknav b{font-size:15px}
+.weeknav small{font-size:12.5px;color:var(--muted);font-weight:600}
+.weeknav .btn[disabled]{opacity:.35;cursor:default}
+.tag-new{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--apricot-soft);color:var(--apricot);padding:2px 7px;border-radius:99px;margin-left:4px;vertical-align:1px;white-space:nowrap}
+.plist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+.prow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.prow h5{margin:0;font-size:14.5px}
+.prow p{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.prow>b{font-size:14px;white-space:nowrap}
+.prow.done h5,.prow.done>b{text-decoration:line-through;color:var(--muted)}
+.prow .chk{width:34px;height:34px;border-radius:10px}
+.prow .chk svg{width:17px;height:17px}
+.dchip{font-size:11px;font-weight:800;background:var(--surface-2);color:var(--ink);padding:1px 7px;border-radius:99px}
+.ptip{width:100%;font-size:12px}
+.fdot{width:10px;height:10px;border-radius:50%}
+.chip.added{background:var(--accent-soft);color:var(--accent)}
+.chip.cbtn{border:1px solid var(--line);background:var(--surface);cursor:pointer;min-height:34px}
+.chip.cbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.field textarea{font:inherit;font-size:16px;-webkit-appearance:none;appearance:none;margin:0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);width:100%;resize:vertical;min-height:84px}
+.hint{font-size:13px;background:var(--warn-soft);color:var(--ink);border-radius:12px;padding:10px 12px}
 </style>
 
 <div class="app">
@@ -315,6 +343,29 @@ td:last-child{font-weight:700;white-space:nowrap}
     <div class="row">
       <button type="button" class="btn ghost" data-act="close-sheet">Отмена</button>
       <button type="submit" class="btn primary">Сохранить</button>
+    </div>
+  </form>
+</div>
+<div class="sheet-bg" id="foodSheet" hidden>
+  <form class="sheet" id="foodForm" aria-labelledby="foodTitle" autocomplete="off">
+    <h3 id="foodTitle">Добавить продукт в рацион</h3>
+    <div class="field">
+      <label for="ff-name">Продукт</label>
+      <input type="text" id="ff-name" maxlength="40" placeholder="Например: помидор" required>
+      <div class="chips" id="ff-sugg" aria-label="Подсказки"></div>
+    </div>
+    <div class="field">
+      <span class="lab">Что это</span>
+      <div class="chips" id="ff-cats"></div>
+    </div>
+    <div class="field">
+      <label for="ff-how">Как готовить</label>
+      <textarea id="ff-how" rows="3" maxlength="400"></textarea>
+    </div>
+    <p class="hint" id="ff-hint" hidden></p>
+    <div class="row">
+      <button type="button" class="btn ghost" data-act="close-food">Отмена</button>
+      <button type="submit" class="btn primary">Добавить в меню</button>
     </div>
   </form>
 </div>
@@ -403,6 +454,81 @@ const NEXT=[
  ["chick","Нут","Разварить и протереть, как чечевицу."],
  ["texture","Кусочки вместо пюре","Разминать вилкой, давать мягкие кусочки в руки. Комочки важно освоить до 10 месяцев."]];
 
+/* ---------- food catalogue for products added later ---------- */
+const CATS={veg:"Овощ",fruit:"Фрукт, ягода",meat:"Мясо",fish:"Рыба",grain:"Крупа",legume:"Бобовые",side:"Гарнир",dairy:"Кисломолочное",fat:"Масло",extra:"Добавка в кашу",herb:"Зелень"};
+const GENERIC={
+ veg:"Вымыть, очистить, нарезать, варить на пару до мягкости 10–20 минут, размять с отваром.",
+ fruit:"Спелый плод очистить от кожуры и косточек, размять. Твёрдый — запечь или отварить на пару 5 минут.",
+ meat:"Кусок без жира и плёнок варить до мягкости (от 40 минут до 2 часов), измельчить блендером с бульоном.",
+ fish:"Филе варить 10–15 минут, тщательно перебрать и убрать все кости, размять с овощным отваром.",
+ grain:"2 ст. л. крупы, смолотой в кофемолке, на 150 мл воды, варить 10–20 минут, помешивая. Остудить, добавить 2–3 ст. л. смеси и масло.",
+ legume:"Разварить до полной мягкости, пробить блендером, добавлять по 1–2 ст. л. к овощам. Может вызывать газы.",
+ side:"Отварить до мягкости, мелко нарезать или размять, смешать с овощами.",
+ dairy:"Детский продукт без сахара, комнатной температуры. Начинать с 1–2 ч. л.",
+ fat:"1 ч. л. в готовое овощное пюре.",
+ extra:"Небольшое количество размешать в тёплой каше.",
+ herb:"Мелко порубить и добавить в овощи в конце варки."};
+const PORTION={veg:"30 г",fruit:"40 г",meat:"50 г",fish:"50 г",grain:"150 г",legume:"20 г",side:"30 г",dairy:"50 г",fat:"1 ч. л.",extra:"½ ч. л.",herb:"щепотка"};
+const FREQ={veg:3,fruit:2,meat:2,fish:2,grain:2,legume:2,side:2,dairy:2,fat:3,extra:3,herb:3};
+const GROUP={veg:"veg",fruit:"fruit",meat:"protein",fish:"protein",grain:"grain",legume:"legume",side:"side",dairy:"dairy",fat:"fat",extra:"extra",herb:"herb"};
+const ALLD=[0,1,2,3,4,5,6].map(d=>({d:d}));
+const CANDS={veg:ALLD,legume:ALLD,side:ALLD,herb:ALLD,fat:ALLD,dairy:ALLD,extra:ALLD,grain:ALLD,
+ fruit:[{d:2,k:"dinner"},{d:6,k:"dinner"},{d:4,k:"dinner"},{d:1,k:"dessert"},{d:3,k:"dessert"},{d:5,k:"dessert"},{d:4,k:"dessert"}],
+ meat:[0,1,2,3,5,6].map(d=>({d:d})),fish:[0,1,2,3,5,6].map(d=>({d:d}))};
+// [name, category, how to cook, flag]  flag: soft = helps stool, firm = may firm stool, allergen
+const CATALOG=[
+ ["помидор","veg","Обдать кипятком, снять кожицу, убрать семена. Потушить 5 минут или добавить к овощам в конце варки, размять. Кислый: возможно покраснение вокруг рта."],
+ ["огурец","veg","Очистить от кожуры, убрать семена, натереть на мелкой тёрке или дать тонкими брусочками в руки. Готовить не нужно."],
+ ["батат","veg","Очистить, нарезать кубиками, варить на пару 15–20 минут или запечь, размять.","soft"],
+ ["шпинат","veg","Листья без стеблей потушить 3–5 минут, пробить блендером с другими овощами. Не больше 20–30 г за раз."],
+ ["стручковая фасоль","veg","Отрезать кончики, варить 10–12 минут, пробить блендером: кожица жёсткая.","soft"],
+ ["болгарский перец","veg","Запечь до мягкости, снять кожицу, убрать семена, размять."],
+ ["баклажан","veg","Очистить от кожуры, потушить или запечь 15–20 минут, размять."],
+ ["пастернак","veg","Очистить, нарезать, варить 15 минут, размять."],
+ ["сельдерей","veg","Корень очистить, нарезать кубиками, варить 15 минут, пробить с другими овощами."],
+ ["лук","veg","Мелко нарезать и варить с другими овощами 10 минут — только в составе пюре, для вкуса."],
+ ["киви","fruit","Спелый киви очистить, размять вилкой. Возможно покраснение вокруг рта.","soft"],
+ ["нектарин","fruit","Обдать кипятком, снять кожицу, убрать косточку, размять.","soft"],
+ ["дыня","fruit","Спелую мякоть без семян размять вилкой."],
+ ["арбуз","fruit","Мякоть без косточек размять, давать немного."],
+ ["вишня","fruit","Убрать косточки, обдать кипятком, протереть через сито."],
+ ["черешня","fruit","Убрать косточки, обдать кипятком, протереть через сито."],
+ ["голубика","fruit","Раздавить вилкой, целыми ягодами не давать.","soft"],
+ ["ежевика","fruit","Протереть через сито, чтобы убрать косточки."],
+ ["инжир","fruit","Свежий очистить и размять, сушёный распарить и пробить блендером.","soft"],
+ ["хурма","fruit","Только очень спелая, без кожицы, размять.","firm"],
+ ["свинина","meat","Нежирную вырезку варить 1,5 часа, измельчить блендером с бульоном."],
+ ["баранина","meat","Нежирный кусок варить 1,5–2 часа, измельчить блендером с бульоном."],
+ ["печень куриная","meat","Очистить от плёнок, варить 10–15 минут, пробить с бульоном. Не чаще раза в неделю."],
+ ["белая рыба","fish","Треска, хек или минтай: филе варить 10–15 минут, тщательно убрать все кости, размять с овощным отваром.","allergen"],
+ ["треска","fish","Филе варить 10–15 минут, тщательно убрать все кости, размять с овощным отваром.","allergen"],
+ ["хек","fish","Филе варить 10–15 минут, тщательно убрать все кости, размять с овощным отваром.","allergen"],
+ ["минтай","fish","Филе варить 10–15 минут, тщательно убрать все кости, размять с овощным отваром.","allergen"],
+ ["судак","fish","Филе варить 10–15 минут, тщательно убрать все кости, размять с овощным отваром.","allergen"],
+ ["лосось","fish","Филе варить 10–15 минут, снять кожу, убрать кости, размять. Жирная рыба — раз в неделю.","allergen"],
+ ["форель","fish","Филе варить 10–15 минут, снять кожу, убрать кости, размять.","allergen"],
+ ["пшённая","grain","2 ст. л. промытого пшена на 150 мл воды, варить 20–25 минут, пробить блендером. Остудить, добавить смесь и масло."],
+ ["ячневая","grain","2 ст. л. смолотой крупы на 150 мл воды, варить 15–20 минут, помешивая. Остудить, добавить смесь и масло.","soft"],
+ ["киноа","grain","Хорошо промыть, варить 15 минут, пробить с водой. Остудить, добавить смесь и масло."],
+ ["красная чечевица","legume","1 ст. л. промыть, варить 15–20 минут до разваривания, пробить с овощами. Может вызывать газы.","soft"],
+ ["нут","legume","Замочить на ночь, варить 1–1,5 часа, протереть. Добавлять по 1 ст. л. к овощам.","soft"],
+ ["макароны","side","Мелкие макароны из твёрдых сортов отварить до мягкости, смешать с овощами."],
+ ["кефир","dairy","Детский кефир комнатной температуры, 30–50 мл. Пока стул твёрдый — понемногу."],
+ ["йогурт","dairy","Детский йогурт без сахара, 30–50 г."],
+ ["оливковое масло","fat","1 ч. л. в готовое овощное пюре."],
+ ["льняное масло","fat","½–1 ч. л. в готовое овощное пюре, не нагревать.","soft"],
+ ["арахисовая паста","extra","Без сахара и соли. Развести водой или смесью и размешать в каше — с кончика ложки до ½ ч. л. Целые орехи нельзя.","allergen"],
+ ["кунжутная паста","extra","Тахини без соли: размешать в каше, с кончика ложки до ½ ч. л.","allergen"],
+ ["миндальная паста","extra","Без сахара: размешать в каше, с кончика ложки до ½ ч. л.","allergen"],
+ ["сыр","extra","Мягкий несолёный сыр, 5 г натереть в кашу или овощи."],
+ ["укроп","herb","Мелко порубить и добавить в овощи в конце варки."],
+ ["петрушка","herb","Мелко порубить и добавить в овощи в конце варки."]];
+const NEXT_FOOD={fish:"белая рыба",lentil:"красная чечевица",olive:"оливковое масло",peanut:"арахисовая паста",kiwi:"киви",batat:"батат",chick:"нут"};
+const BASE_FOODS=[].concat.apply([],FOOD_GROUPS.map(g=>g[1]));
+const MEATS=["Индейка","Говядина","Кролик","Курица","Телятина"];
+const MON_S=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+const DOW_S=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const pad=n=>String(n).padStart(2,"0");
@@ -413,9 +539,9 @@ const MONTHS=["января","февраля","марта","апреля","ма�
 const CHECK_SVG='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 const LS="baby-menu-v1";
-const state={checks:{},stool:[],foods:{}};
-let db=null, ui={tab:"today",menuDay:dow(new Date()),type:3,cry:false};
-try{const j=JSON.parse(localStorage.getItem(LS)||"null");if(j){state.checks=j.checks||{};state.stool=j.stool||[];state.foods=j.foods||{}}}catch(e){}
+const state={checks:{},stool:[],foods:{},prep:{}};
+let db=null, ui={tab:"today",menuDay:dow(new Date()),menuWeek:0,menuMode:"days",prepN:3,type:3,cry:false,fcat:"veg",howEdited:false};
+try{const j=JSON.parse(localStorage.getItem(LS)||"null");if(j){state.checks=j.checks||{};state.stool=j.stool||[];state.foods=j.foods||{};state.prep=j.prep||{}}}catch(e){}
 try{const t=localStorage.getItem(LS+"-tab");if(t)ui.tab=t}catch(e){}
 function saveLocal(){if(db)return;try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 
@@ -453,11 +579,93 @@ function delStool(id){
   render();saveLocal();
   if(db)write("stool/"+id,()=>db.doc("stool/"+id).delete());
 }
-function toggleFood(k){
-  state.foods=Object.assign({},state.foods,{[k]:!state.foods[k]});
+function saveFoods(next){
+  state.foods=next;
   render();saveLocal();
-  if(db)write("foods/state",()=>db.doc("foods/state").set(Object.assign({},state.foods)));
+  if(db)write("foods/state",()=>db.doc("foods/state").set(JSON.parse(JSON.stringify(state.foods))));
 }
+function toggleFood(k){saveFoods(Object.assign({},state.foods,{[k]:!nextDone(k)}))}
+function addFood(f){
+  const added=(state.foods.added||[]).slice();
+  added.push(f);
+  saveFoods(Object.assign({},state.foods,{added:added}));
+}
+function removeFood(id){
+  saveFoods(Object.assign({},state.foods,{added:(state.foods.added||[]).filter(f=>f.id!==id)}));
+}
+function togglePrep(key){
+  const p=Object.assign({},state.prep),today=keyOf(new Date());
+  if(p[key])delete p[key];else p[key]=1;
+  Object.keys(p).forEach(k=>{if(k.slice(0,10)<keyOf(new Date(Date.now()-10*864e5)))delete p[k]});
+  state.prep=p;
+  renderMenu();restoreOpen();saveLocal();
+  if(db)write("prep/state",()=>db.doc("prep/state").set(Object.assign({},state.prep)));
+}
+
+/* ---------- menu generator: base week + products added later ---------- */
+const lc=s=>String(s).toLowerCase();
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+function catOf(name){const n=lc(name).trim();return CATALOG.find(c=>c[0]===n)||null}
+function nextDone(k){const nm=NEXT_FOOD[k];return !!state.foods[k]||(!!nm&&(state.foods.added||[]).some(f=>lc(f.name)===nm))}
+function knownFood(name){const n=lc(name).trim();return BASE_FOODS.indexOf(n)>=0||allAdded().some(f=>lc(f.name)===n)}
+function allAdded(){
+  const list=[],seen={};
+  (state.foods.added||[]).forEach(f=>{const n=lc(f.name);if(!seen[n]){seen[n]=1;list.push(f)}});
+  NEXT.forEach(x=>{const nm=NEXT_FOOD[x[0]];if(nm&&state.foods[x[0]]&&!seen[nm]){seen[nm]=1;const c=catOf(nm);list.push({name:nm,cat:c?c[1]:"veg",how:c?c[2]:"",date:null})}});
+  return list;
+}
+function weekNo(d){const m=new Date(d);m.setHours(12,0,0,0);m.setDate(m.getDate()-dow(m));return Math.round((Date.UTC(m.getFullYear(),m.getMonth(),m.getDate())-Date.UTC(1970,0,5))/864e5/7)}
+const gr=s=>{const m=/^(\d+)/.exec(String(s));return m?Number(m[1]):0};
+const isNewFood=f=>!!f.date&&Date.now()-f.date<7*864e5;
+const isOil=n=>/масло/i.test(n);
+function lunchTitle(L){return cap(L.i.filter(i=>!isOil(i[0])&&!/^(Хлеб|Десерт)/.test(i[0])).map(i=>lc(i[0])).join(", "))}
+function bTitle(B){return cap(B.i.filter(i=>!isOil(i[0])).map(i=>lc(i[0])).join(", "))}
+function dropRecipe(M,name){M.r=M.r.filter(r=>lc(r[0])!==lc(name))}
+function placeFood(D,cat,slot,f){
+  const fl=isNewFood(f)?"new":"add",nm=cap(f.name),how=(isNewFood(f)?"Первые дни — 1–2 ч. л., следите за реакцией. ":"")+(f.how||GENERIC[cat]),por=PORTION[cat];
+  const L=D.l,B=D.b,oilIdx=()=>{const i=L.i.findIndex(x=>isOil(x[0]));return i<0?L.i.length:i};
+  if(cat==="veg"||cat==="side"||cat==="legume"||cat==="herb"){
+    if(cat==="veg"||cat==="side"){
+      let bi=-1,bg=0;L.i.forEach((x,i)=>{if(isOil(x[0])||/^(Хлеб|Десерт)/.test(x[0])||MEATS.indexOf(x[0])>=0||/^Печень/.test(x[0])||x[2])return;const g=gr(x[1]);if(g>bg){bg=g;bi=i}});
+      if(bi>=0&&bg-gr(por)>=30)L.i[bi]=[L.i[bi][0],(bg-gr(por))+" г"];
+    }
+    L.i.splice(oilIdx(),0,[nm,por,fl]);L.r.push([nm,how]);L.t=lunchTitle(L);
+  }else if(cat==="meat"||cat==="fish"){
+    const mi=L.i.findIndex(x=>MEATS.indexOf(x[0])>=0);if(mi<0)return false;
+    dropRecipe(L,L.i[mi][0]);L.i[mi]=[nm,"50 г",fl];L.r.push([nm,how]);L.t=lunchTitle(L);
+  }else if(cat==="fruit"){
+    if(slot.k==="dinner"){D.d={t:"Смесь + "+lc(f.name),i:[["Смесь","150–180 мл"],[nm,"50 г",fl]],r:[[nm,how]]}}
+    else{const di=L.i.findIndex(x=>/^Десерт:/.test(x[0]));if(di<0)return false;
+      dropRecipe(L,L.i[di][0].replace(/^Десерт:\s*/,""));L.i[di]=["Десерт: "+lc(f.name),"40 г",fl];L.r.push([nm,how])}
+  }else if(cat==="grain"){
+    const pn=/(ая|яя)$/.test(lc(f.name))?nm+" каша":"Каша: "+lc(f.name);
+    dropRecipe(B,B.i[0][0]);B.i[0]=[pn,B.i[0][1],fl];B.r.unshift([pn,how]);B.t=bTitle(B);
+  }else if(cat==="fat"){
+    const oi=L.i.findIndex(x=>isOil(x[0]));if(oi<0)return false;L.i[oi]=[nm,"1 ч. л.",fl];L.r.push([nm,how]);
+  }else if(cat==="dairy"){
+    D.d.i.push([nm,por,fl]);D.d.r.push([nm,how]);D.d.t+=" + "+lc(f.name);
+  }else if(cat==="extra"){
+    B.i.push([nm,por,fl]);B.r.push([nm,how]);B.t=bTitle(B);
+  }
+  return true;
+}
+const weekCache={};
+function weekMenu(w){
+  const foods=allAdded(),sig=w+"|"+Math.floor(Date.now()/864e5)+"|"+JSON.stringify(foods.map(f=>[f.name,f.cat,f.how||"",f.date||0]));
+  if(weekCache.sig===sig)return weekCache.val;
+  const W=JSON.parse(JSON.stringify(DAYS)),used={},idxInCat={};
+  foods.forEach(f=>{
+    const cat=CANDS[f.cat]?f.cat:"veg",c=CANDS[cat],n=Math.min(FREQ[cat],c.length),idx=idxInCat[cat]=(idxInCat[cat]||0)+1;
+    const step=Math.max(1,Math.floor(c.length/n));let pos=((idx-1)*n+w*(cat==="fruit"?1:2))%c.length,placed=0,tries=0;
+    while(placed<n&&tries<c.length*3){
+      const s=c[pos%c.length],key=GROUP[cat]+"|"+s.d+"|"+(s.k||"");
+      if(!used[key]&&placeFood(W[s.d],cat,s,f)){used[key]=1;placed++;pos+=step}else pos++;
+      tries++;
+    }
+  });
+  weekCache.sig=sig;weekCache.val=W;return W;
+}
+const menuFor=d=>weekMenu(weekNo(d))[dow(d)];
 
 /* ---------- helpers ---------- */
 function dayDone(k){const c=state.checks[k]||{};return SLOTS.filter(s=>c[s.k]).length}
@@ -486,11 +694,11 @@ function stoolStatus(){
 }
 function alertHTML(s){return'<div class="alert '+s.cls+'"><span class="dot"></span><div><h4>'+esc(s.h)+'</h4><p>'+esc(s.p)+'</p></div></div>'}
 function chk(attrs,on,label){return'<button class="chk" '+attrs+' aria-pressed="'+(on?"true":"false")+'" aria-label="'+esc(label)+'">'+CHECK_SVG+'</button>'}
-function itemsHTML(items){return'<ul class="items">'+items.map(i=>'<li><span>'+esc(i[0])+'</span><span class="num">'+esc(i[1])+'</span></li>').join("")+'</ul>'}
+function itemsHTML(items){return'<ul class="items">'+items.map(i=>'<li><span>'+esc(i[0])+(i[2]==="new"?' <em class="tag-new">новое</em>':'')+'</span><span class="num">'+esc(i[1])+'</span></li>').join("")+'</ul>'}
 
 /* ---------- views ---------- */
 function renderToday(){
-  const now=new Date(),k=keyOf(now),di=dow(now),D=DAYS[di],c=state.checks[k]||{};
+  const now=new Date(),k=keyOf(now),D=menuFor(now),c=state.checks[k]||{};
   const done=dayDone(k),C=2*Math.PI*42,off=C*(1-done/5);
   const water=c.water||0;
   const last=sortedStool()[0];
@@ -511,19 +719,90 @@ function renderToday(){
   h+='</ol>';
   $("#v-today").innerHTML=h;
 }
-function renderMenu(){
-  const di=ui.menuDay,D=DAYS[di],date=dateForDow(di),k=keyOf(date),c=state.checks[k]||{},todayI=dow(new Date());
-  let h='<div class="days" role="group" aria-label="День недели">';
-  DAYS.forEach((d,i)=>{
-    const dk=keyOf(dateForDow(i)),cc=state.checks[dk]||{};
-    h+='<button class="day'+(i===todayI?" today":"")+'" data-act="day" data-i="'+i+'" aria-pressed="'+(i===di)+'">'+d.s+'<small class="num">'+dateForDow(i).getDate()+'</small><span class="pips">'+SLOTS.map(s=>'<i class="'+(cc[s.k]?"on":"")+'"></i>').join("")+'</span></button>';
+function addDays(d,n){const x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()+n);return x}
+function weekLabel(off){return off===0?"Эта неделя":off===1?"Следующая неделя":off===-1?"Прошлая неделя":off>1?"Через "+off+" нед.":(-off)+" нед. назад"}
+const shortDate=d=>d.getDate()+" "+MON_S[d.getMonth()];
+const fmtN=n=>(Math.round(n*10)/10).toString().replace(".",",");
+function parseAmt(s){const m=/^([\d.]+)(?:\s*–\s*([\d.]+))?\s*(.*)$/.exec(String(s).replace(/½/g,"0.5"));return m?{min:+m[1],max:+(m[2]||m[1]),unit:m[3].trim()}:null}
+const SPLIT={"Груша с черносливом":["Груша","Чернослив"],"Яблоко с абрикосом":["Яблоко","Абрикос"]};
+function prepCat(name){
+  const n=lc(name),f=allAdded().find(x=>lc(x.name)===n);
+  if(/каша/.test(n))return"Крупы";
+  if(isOil(name))return"Масла";
+  if(n==="яйцо")return"Яйца";
+  if(f)return{veg:"Овощи",legume:"Овощи",herb:"Овощи",side:"Крупы",grain:"Крупы",meat:"Мясо и рыба",fish:"Мясо и рыба",fruit:"Фрукты и ягоды",dairy:"Другое",fat:"Масла",extra:"Другое"}[f.cat]||"Другое";
+  if(MEATS.indexOf(name)>=0||/^печень/.test(n))return"Мясо и рыба";
+  if(FOOD_GROUPS[0][1].indexOf(n)>=0)return"Фрукты и ягоды";
+  if(FOOD_GROUPS[1][1].indexOf(n)>=0||/горош/.test(n))return"Овощи";
+  return"Другое";
+}
+function prepTip(name,cat,total){
+  const n=lc(name);
+  if(cat==="Мясо и рыба")return"Сварить сразу "+total+", измельчить, заморозить порциями";
+  if(n==="свёкла")return"Варить 40–60 минут — удобно накануне вечером";
+  if(n==="чернослив")return"Распарить вечером, хранить в холодильнике до 2 дней";
+  if(cat==="Крупы"&&/каша/.test(n))return"Детская из пачки или смолоть крупу заранее";
+  return"";
+}
+function prepList(dates){
+  const map={};
+  function add(name,amt,dl){
+    const a=parseAmt(amt);let unit=a?a.unit:"раз",mn=a?a.min:1,mx=a?a.max:1;
+    if(unit==="яйца"){unit="шт."}
+    const e=map[name]||(map[name]={name:name,min:0,max:0,unit:unit,days:[]});
+    if(e.unit===unit){e.min+=mn;e.max+=mx}
+    if(e.days.indexOf(dl)<0)e.days.push(dl);
+  }
+  dates.forEach(dt=>{const D=menuFor(dt),dl=DOW_S[dow(dt)];
+    ["b","l","d"].forEach(sk=>D[sk].i.forEach(it=>{
+      let name=it[0].replace(/^Десерт:\s*/,""),amt=it[1];
+      if(name==="Смесь")return;
+      name=cap(name);
+      if(/^Омлет/.test(name)){add("Яйцо",amt,dl);return}
+      if(name==="Пюре из чернослива")name="Чернослив";
+      if(SPLIT[name]){const g=gr(amt)/2;SPLIT[name].forEach(p=>add(p,g+" г",dl));return}
+      add(name,amt,dl);
+    }));
   });
-  h+='</div><div><p class="eyebrow">'+(di===todayI?"Сегодня":"Эта неделя")+'</p><h2 style="font-size:24px;margin-top:2px">'+D.n+'</h2></div>';
+  const groups={};
+  Object.keys(map).forEach(k=>{const e=map[k],cat=prepCat(e.name);
+    e.total=(e.unit==="раз"?e.min+" "+(e.min===1?"раз":"раза"):(e.min===e.max?fmtN(e.min):fmtN(e.min)+"–"+fmtN(e.max))+" "+e.unit);
+    e.tip=prepTip(e.name,cat,e.total);(groups[cat]=groups[cat]||[]).push(e)});
+  return groups;
+}
+function prepHTML(){
+  const n=ui.prepN,start=addDays(new Date(),1),dates=[];for(let i=0;i<n;i++)dates.push(addDays(start,i));
+  const sk=keyOf(start),end=dates[dates.length-1];
+  let h='<div class="range" role="group" aria-label="На сколько дней">'+[[1,"Завтра"],[3,"3 дня"],[7,"Неделя"]].map(r=>'<button class="rbtn" data-act="prep-n" data-n="'+r[0]+'" aria-pressed="'+(n===r[0])+'">'+r[1]+'</button>').join("")+'</div>';
+  h+='<div><p class="eyebrow">Заготовки и покупки</p><h2 style="font-size:22px;margin-top:2px">'+(n===1?shortDate(start)+", "+lc(DAYS[dow(start)].n):shortDate(start)+" — "+shortDate(end))+'</h2><p class="muted" style="font-size:13.5px;margin-top:4px">Всё, что понадобится на эти дни, по меню. Отмечайте, что купили или приготовили.</p></div>';
+  const groups=prepList(dates),order=["Мясо и рыба","Овощи","Фрукты и ягоды","Крупы","Яйца","Масла","Другое"];
+  const long=[].concat(groups["Мясо и рыба"]||[],(groups["Овощи"]||[]).filter(e=>lc(e.name)==="свёкла"));
+  if(long.length)h+='<div class="alert info"><span class="dot"></span><div><h4>Сделать заранее</h4><p>'+long.map(e=>esc(e.name)+" — "+esc(e.total)).join(", ")+'. Мясо можно сварить за раз и заморозить порциями по 25 г.</p></div></div>';
+  order.forEach(g=>{const list=groups[g];if(!list)return;
+    let done=0;const rows=list.map(e=>{const key=sk+"|"+n+"|"+e.name,on=!!state.prep[key];if(on)done++;
+      return'<li class="prow'+(on?" done":"")+'">'+chk('data-act="prep" data-key="'+esc(key)+'"',on,e.name+": готово")+'<div style="min-width:0"><h5>'+esc(e.name)+'</h5><p>'+e.days.map(d=>'<span class="dchip">'+d+'</span>').join("")+(e.tip?' <span class="ptip">'+esc(e.tip)+'</span>':'')+'</p></div><b class="num">'+esc(e.total)+'</b></li>'}).join("");
+    h+='<div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h3 style="font-size:16px">'+g+'</h3><span class="muted num" style="font-size:12.5px;font-weight:700">'+done+' из '+list.length+'</span></div><ul class="plist">'+rows+'</ul></div>';
+  });
+  return h;
+}
+function renderMenu(){
+  const mode=ui.menuMode;
+  let h='<div class="seg" role="group" aria-label="Вид меню"><button class="sbtn" data-act="mode" data-m="days" aria-pressed="'+(mode==="days")+'">По дням</button><button class="sbtn" data-act="mode" data-m="prep" aria-pressed="'+(mode==="prep")+'">Заготовки</button></div>';
+  if(mode==="prep"){$("#v-menu").innerHTML=h+prepHTML();return}
+  const off=ui.menuWeek,mon=addDays(new Date(),-dow(new Date())+off*7),dates=[0,1,2,3,4,5,6].map(i=>addDays(mon,i));
+  const di=ui.menuDay,date=dates[di],D=menuFor(date),k=keyOf(date),c=state.checks[k]||{},todayK=keyOf(new Date());
+  h+='<div class="weeknav"><button class="btn round" data-act="week" data-d="-1" aria-label="Предыдущая неделя"'+(off<=-4?" disabled":"")+'>‹</button><div><b>'+weekLabel(off)+'</b><small class="num">'+shortDate(dates[0])+' — '+shortDate(dates[6])+'</small></div><button class="btn round" data-act="week" data-d="1" aria-label="Следующая неделя"'+(off>=8?" disabled":"")+'>›</button></div>';
+  h+='<div class="days" role="group" aria-label="День недели">';
+  DAYS.forEach((d,i)=>{
+    const dk=keyOf(dates[i]),cc=state.checks[dk]||{};
+    h+='<button class="day'+(dk===todayK?" today":"")+'" data-act="day" data-i="'+i+'" aria-pressed="'+(i===di)+'">'+d.s+'<small class="num">'+dates[i].getDate()+'</small><span class="pips">'+SLOTS.map(s=>'<i class="'+(cc[s.k]?"on":"")+'"></i>').join("")+'</span></button>';
+  });
+  h+='</div><div><p class="eyebrow">'+(k===todayK?"Сегодня":k===keyOf(addDays(new Date(),1))?"Завтра":weekLabel(off))+'</p><h2 style="font-size:24px;margin-top:2px">'+DAYS[di].n+', '+date.getDate()+' '+MONTHS[date.getMonth()]+'</h2></div>';
   h+='<div class="formula">'+["m","n"].map(sk=>{const s=SLOTS.find(x=>x.k===sk);return'<span class="pill">'+s.time+' · смесь 180–200 мл'+chk('data-act="check" data-k="'+k+'" data-s="'+sk+'"',!!c[sk],s.name)+'</span>'}).join("")+'</div>';
   [["b","Завтрак","09:30"],["l","Обед","13:30"],["d","Ужин","17:30"]].forEach(([sk,name,time])=>{
     const m=D[sk];
     h+='<article class="card meal"><div class="meal-head"><div style="min-width:0"><span class="tag '+sk+'">'+name+' · '+time+'</span><h3>'+esc(m.t)+'</h3></div>'+chk('data-act="check" data-k="'+k+'" data-s="'+sk+'"',!!c[sk],name+": съели")+'</div>'+itemsHTML(m.i)+
-     '<details class="recipes" data-d="r-'+di+sk+'"><summary>Как готовить</summary><div class="rec">'+m.r.map(r=>'<div><b>'+esc(r[0])+'</b>'+esc(r[1])+'</div>').join("")+'</div></details></article>';
+     '<details class="recipes" data-d="r-'+off+di+sk+'"><summary>Как готовить</summary><div class="rec">'+m.r.map(r=>'<div><b>'+esc(r[0])+'</b>'+esc(r[1])+'</div>').join("")+'</div></details></article>';
   });
   $("#v-menu").innerHTML=h;
 }
@@ -563,13 +842,26 @@ function renderStool(){
   h+='</div><div class="card"><p class="eyebrow">Срочно к врачу, если</p><ul class="flags"><li>кровь в стуле или на подгузнике</li><li>рвота, особенно зелёная</li><li>вздутый твёрдый живот, вялость, плач без остановки</li><li>нет стула больше 5 дней</li><li>отказ от еды, температура</li></ul></div>';
   $("#v-stool").innerHTML=h;
 }
+function timesThisWeek(name){
+  const n=lc(name),W=weekMenu(weekNo(new Date()));let c=0;
+  W.forEach(D=>["b","l","d"].forEach(sk=>D[sk].i.forEach(i=>{if(i[2]&&lc(i[0]).indexOf(n)>=0)c++})));
+  return c;
+}
 function renderFoods(){
-  let h='<div><p class="eyebrow">Рацион</p><h2 style="font-size:24px;margin-top:2px">Продукты</h2></div>';
-  const doneN=NEXT.filter(n=>state.foods[n[0]]).length;
-  h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><h3 style="font-size:17px">Что ввести дальше</h3><span class="muted num" style="font-size:13px;font-weight:700">'+doneN+' из '+NEXT.length+'</span></div><p class="muted" style="font-size:13.5px;margin-top:4px">По одному новому продукту в 2–3 дня, утром или днём, с 1 чайной ложки.</p><ul class="todo">'+
-    NEXT.map(n=>{const on=!!state.foods[n[0]];return'<li class="'+(on?"done":"")+'">'+chk('data-act="food" data-f="'+n[0]+'"',on,n[1]+": введено")+'<div><h5>'+esc(n[1])+'</h5><p>'+esc(n[2])+'</p></div></li>'}).join("")+'</ul></div>';
-  h+='<div class="card"><h3 style="font-size:17px">Уже введено</h3><p class="muted" style="font-size:13.5px;margin-top:4px">Зачёркнуты продукты на паузе из-за запоров (2–3 недели).</p>'+
-    FOOD_GROUPS.map(g=>'<div class="group" style="margin-top:12px"><h5>'+g[0]+'</h5><div class="chips">'+g[1].map(f=>'<span class="chip'+(PAUSED.includes(f)?" pause":"")+'">'+esc(f)+'</span>').join("")+'</div></div>').join("")+'</div>';
+  let h='<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap"><div><p class="eyebrow">Рацион</p><h2 style="font-size:24px;margin-top:2px">Продукты</h2></div><button class="btn primary" data-act="open-food">+ Добавить продукт</button></div>';
+  const added=state.foods.added||[];
+  if(added.length){
+    h+='<div class="card"><h3 style="font-size:17px">Добавлено вами</h3><p class="muted" style="font-size:13.5px;margin-top:4px">Эти продукты уже стоят в меню. Если продукт не подошёл, удалите его — меню перестроится.</p><ul class="plist">'+
+      added.slice().sort((a,b)=>(b.date||0)-(a.date||0)).map(f=>{const t=timesThisWeek(f.name),d=f.date?new Date(f.date):null;
+        return'<li class="prow"><span class="fdot" style="background:var(--accent)"></span><div style="min-width:0"><h5>'+esc(cap(f.name))+(isNewFood(f)?' <em class="tag-new">новое</em>':'')+'</h5><p>'+esc(CATS[f.cat]||"")+(d?' · с '+shortDate(d):'')+' · '+(t?'в меню на неделе: '+t+' раз'+(t>1&&t<5?'а':''):'появится в меню на следующей неделе')+'</p></div><button class="btn ghost danger" data-act="del-food" data-id="'+esc(f.id)+'">Удалить</button></li>'}).join("")+'</ul></div>';
+  }
+  const doneN=NEXT.filter(n=>nextDone(n[0])).length;
+  h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><h3 style="font-size:17px">Что ввести дальше</h3><span class="muted num" style="font-size:13px;font-weight:700">'+doneN+' из '+NEXT.length+'</span></div><p class="muted" style="font-size:13.5px;margin-top:4px">По одному новому продукту в 2–3 дня, утром или днём, с 1 чайной ложки. Отмеченный продукт сразу появится в меню.</p><ul class="todo">'+
+    NEXT.map(n=>{const on=nextDone(n[0]);return'<li class="'+(on?"done":"")+'">'+chk('data-act="food" data-f="'+n[0]+'"',on,n[1]+": введено")+'<div><h5>'+esc(n[1])+'</h5><p>'+esc(n[2])+'</p></div></li>'}).join("")+'</ul></div>';
+  const extraByGroup=[[],[],[],[],[]],gi={fruit:0,veg:1,legume:1,herb:1,meat:2,fish:2,grain:3,side:3,fat:4,dairy:4,extra:4};
+  allAdded().forEach(f=>{const i=gi[f.cat];if(i!==undefined&&FOOD_GROUPS[i][1].indexOf(lc(f.name))<0)extraByGroup[i].push(lc(f.name))});
+  h+='<div class="card"><h3 style="font-size:17px">Уже введено</h3><p class="muted" style="font-size:13.5px;margin-top:4px">Зачёркнуты продукты на паузе из-за запоров (2–3 недели), зелёным — добавленные вами.</p>'+
+    FOOD_GROUPS.map((g,gidx)=>'<div class="group" style="margin-top:12px"><h5>'+g[0]+'</h5><div class="chips">'+g[1].map(f=>'<span class="chip'+(PAUSED.includes(f)?" pause":"")+'">'+esc(f)+'</span>').join("")+extraByGroup[gidx].map(f=>'<span class="chip added">'+esc(f)+'</span>').join("")+'</div></div>').join("")+'</div>';
   h+='<div class="grid2"><div class="card"><h3 style="font-size:17px">Смягчают стул</h3><ul class="rules"><li>чернослив, груша, слива, абрикос, персик</li><li>свёкла, кабачок, брокколи, цветная капуста</li><li>овсяная, гречневая, кукурузная каши</li><li>растительное масло, вода</li></ul></div><div class="card"><h3 style="font-size:17px">Пока нельзя</h3><ul class="rules"><li>мёд — до года</li><li>соль и сахар</li><li>коровье молоко как питьё — до года</li><li>целые орехи, виноград, твёрдые сырые овощи</li><li>тунец, рыба-меч, акула</li></ul></div></div>';
   $("#v-foods").innerHTML=h;
 }
@@ -618,7 +910,55 @@ function openSheet(){
 function drawTypes(){
   $("#f-types").innerHTML=[1,2,3,4,5].map(t=>'<button type="button" class="type" data-act="type" data-t="'+t+'" aria-pressed="'+(ui.type===t)+'"><i style="background:'+ST[t].c+'"></i><span>'+ST[t].n+'</span><small>'+ST[t].d+'</small></button>').join("");
 }
+/* ---------- add-product sheet ---------- */
+function openFood(){
+  $("#ff-name").value="";$("#ff-how").value=GENERIC.veg;ui.fcat="veg";ui.howEdited=false;
+  drawFoodSheet();$("#foodSheet").hidden=false;
+  setTimeout(()=>{try{$("#ff-name").focus()}catch(e){}},50);
+}
+function drawFoodSheet(){
+  const q=lc($("#ff-name").value.trim());
+  const sugg=CATALOG.filter(c=>!knownFood(c[0])&&(!q||c[0].indexOf(q)>=0)).slice(0,q?8:12);
+  $("#ff-sugg").innerHTML=sugg.map(c=>'<button type="button" class="chip cbtn" data-act="fsugg" data-n="'+esc(c[0])+'">'+esc(c[0])+'</button>').join("");
+  $("#ff-cats").innerHTML=Object.keys(CATS).map(k=>'<button type="button" class="chip cbtn" data-act="fcat" data-c="'+k+'" aria-pressed="'+(ui.fcat===k)+'">'+CATS[k]+'</button>').join("");
+  const c=catOf(q),hint=$("#ff-hint"),msgs=[];
+  if(q&&knownFood(q))msgs.push("Этот продукт уже есть в рационе.");
+  if(PAUSED.indexOf(q)>=0)msgs.push("Сейчас на паузе из-за запоров.");
+  if(c&&c[3]==="firm")msgs.push("Может крепить стул — пока запоры, лучше отложить.");
+  if(c&&c[3]==="soft")msgs.push("Помогает мягкому стулу.");
+  if(c&&c[3]==="allergen")msgs.push("Частый аллерген: первый раз — утром, с маленькой порции, наблюдайте 2–3 дня.");
+  if(q&&!c&&!knownFood(q))msgs.push("Такого продукта нет в справочнике. Выберите, что это, и при желании поправьте рецепт.");
+  hint.textContent=msgs.join(" ");hint.hidden=!msgs.length;
+}
+function pickFoodName(n){
+  $("#ff-name").value=n;const c=catOf(n);
+  if(c){ui.fcat=c[1];$("#ff-how").value=c[2];ui.howEdited=false}
+  drawFoodSheet();
+}
+$("#ff-name").addEventListener("input",()=>{
+  const c=catOf($("#ff-name").value);
+  if(c){ui.fcat=c[1];if(!ui.howEdited)$("#ff-how").value=c[2]}
+  drawFoodSheet();
+});
+$("#ff-how").addEventListener("input",()=>{ui.howEdited=true});
+$("#foodForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=$("#ff-name").value.trim().replace(/\s+/g," ");
+  if(!name){toast("Напишите название продукта");return}
+  if(knownFood(name)){toast("«"+cap(lc(name))+"» уже есть в рационе");return}
+  const how=$("#ff-how").value.trim()||GENERIC[ui.fcat];
+  addFood({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:lc(name),cat:ui.fcat,how:how,date:Date.now()});
+  $("#foodSheet").hidden=true;
+  const t=timesThisWeek(name);
+  toast(cap(lc(name))+" в меню"+(t?": "+t+" раз"+(t>1&&t<5?"а":"")+" на этой неделе":" со следующей недели"));
+});
+$("#foodSheet").addEventListener("click",e=>{if(e.target.id==="foodSheet")$("#foodSheet").hidden=true});
+
 const pendingDel={};
+function twoTap(b,id,label,fn){
+  if(pendingDel[id]){delete pendingDel[id];fn()}
+  else{pendingDel[id]=1;b.textContent="Точно?";setTimeout(()=>{if(pendingDel[id]){delete pendingDel[id];b.textContent=label}},3000)}
+}
 document.addEventListener("click",e=>{
   const tabB=e.target.closest(".tab");if(tabB){showTab(tabB.dataset.tab);return}
   const b=e.target.closest("[data-act]");if(!b)return;
@@ -626,19 +966,24 @@ document.addEventListener("click",e=>{
   if(a==="check")setCheck(b.dataset.k,b.dataset.s,b.getAttribute("aria-pressed")!=="true");
   else if(a==="water"){const k=keyOf(new Date());setWater(k,((state.checks[k]||{}).water||0)+Number(b.dataset.d))}
   else if(a==="day"){ui.menuDay=Number(b.dataset.i);renderMenu();restoreOpen()}
+  else if(a==="week"){ui.menuWeek=Math.max(-4,Math.min(8,ui.menuWeek+Number(b.dataset.d)));renderMenu();restoreOpen()}
+  else if(a==="mode"){ui.menuMode=b.dataset.m;renderMenu();restoreOpen();window.scrollTo(0,0)}
+  else if(a==="prep-n"){ui.prepN=Number(b.dataset.n);renderMenu()}
+  else if(a==="prep")togglePrep(b.dataset.key);
   else if(a==="food")toggleFood(b.dataset.f);
+  else if(a==="open-food")openFood();
+  else if(a==="close-food")$("#foodSheet").hidden=true;
+  else if(a==="fsugg")pickFoodName(b.dataset.n);
+  else if(a==="fcat"){ui.fcat=b.dataset.c;if(!ui.howEdited&&!catOf($("#ff-name").value))$("#ff-how").value=GENERIC[ui.fcat];drawFoodSheet()}
+  else if(a==="del-food")twoTap(b,"f"+b.dataset.id,"Удалить",()=>{removeFood(b.dataset.id);toast("Удалено, меню обновлено")});
   else if(a==="open-sheet")openSheet();
   else if(a==="close-sheet")$("#sheet").hidden=true;
   else if(a==="type"){ui.type=Number(b.dataset.t);drawTypes()}
-  else if(a==="del"){
-    const id=b.dataset.id;
-    if(pendingDel[id]){delete pendingDel[id];delStool(id);toast("Запись удалена")}
-    else{pendingDel[id]=1;b.textContent="Точно?";setTimeout(()=>{if(pendingDel[id]){delete pendingDel[id];b.textContent="Удалить"}},3000)}
-  }
+  else if(a==="del")twoTap(b,b.dataset.id,"Удалить",()=>{delStool(b.dataset.id);toast("Запись удалена")});
 });
 $("#f-cry").addEventListener("click",function(){ui.cry=!ui.cry;this.setAttribute("aria-pressed",String(ui.cry))});
 $("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet")$("#sheet").hidden=true});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#sheet").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#sheet").hidden=true;$("#foodSheet").hidden=true}});
 $("#stoolForm").addEventListener("submit",e=>{
   e.preventDefault();
   const v=$("#f-when").value,ts=v?new Date(v).getTime():Date.now();
@@ -657,7 +1002,8 @@ renderRhythm();render();showTab(TABS.includes(hashTab)?hashTab:TABS.includes(ui.
     const s=$("#sync");s.textContent="Синхронизация между устройствами";s.title=s.textContent;s.classList.add("on");
     db.collection("checks").onSnapshot(snap=>{const o={};snap.docs.forEach(x=>{o[x.id]=Object.assign({},x.data())});state.checks=o;render()},onErr);
     db.collection("stool").onSnapshot(snap=>{state.stool=snap.docs.map(x=>Object.assign({id:x.id},x.data()));render()},onErr);
-    db.doc("foods/state").onSnapshot(x=>{state.foods=x.exists?Object.assign({},x.data()):{};render()},onErr);
+    db.doc("foods/state").onSnapshot(x=>{state.foods=x.exists?JSON.parse(JSON.stringify(x.data())):{};render()},onErr);
+    db.doc("prep/state").onSnapshot(x=>{state.prep=x.exists?Object.assign({},x.data()):{};renderMenu();restoreOpen()},onErr);
   }catch(e){}
 })();
 // offline cache for the hosted version (ignored where service workers are unavailable)
